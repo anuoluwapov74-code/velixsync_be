@@ -1,0 +1,272 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Edit {{ view_user.email }} - VelixSync Admin{% endblock %}
+{% block page_title %}Edit User{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+
+  <!-- Breadcrumb -->
+  <div class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+    <a href="{% url 'dashboard:users_list' %}" class="hover:text-indigo-600">Users</a>
+    <i class="fas fa-chevron-right text-xs"></i>
+    <a href="{% url 'dashboard:user_detail' view_user.id %}" class="hover:text-indigo-600 truncate">{{ view_user.email }}</a>
+    <i class="fas fa-chevron-right text-xs"></i>
+    <span class="text-gray-700 font-medium">Edit</span>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.errors %}
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+      <p class="font-semibold mb-1"><i class="fas fa-exclamation-circle mr-1"></i>Please fix the following errors:</p>
+      <ul class="list-disc list-inside space-y-0.5">
+        {% for field in form %}
+          {% for error in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Account -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6 mb-5">
+      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-5">Account Info</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">First Name</label>
+          <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" class="{{ form.first_name.field.widget.attrs.class }}" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Last Name</label>
+          <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" class="{{ form.last_name.field.widget.attrs.class }}" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Email <span class="text-red-500">*</span></label>
+          <input type="email" name="email" value="{{ form.email.value|default:'' }}" class="{{ form.email.field.widget.attrs.class }}" required />
+          {% for e in form.email.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Phone</label>
+          <input type="text" name="phone" value="{{ form.phone.value|default:'' }}" class="{{ form.phone.field.widget.attrs.class }}" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Date of Birth</label>
+          <input type="date" name="dob" value="{{ form.dob.value|default:'' }}" class="{{ form.dob.field.widget.attrs.class }}" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Currency</label>
+          <input type="text" name="currency" value="{{ form.currency.value|default:'' }}" class="{{ form.currency.field.widget.attrs.class }}" placeholder="USD" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6 mb-5">
+      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-5">Location</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Country</label>
+          <input type="text" name="country" value="{{ form.country.value|default:'' }}" class="{{ form.country.field.widget.attrs.class }}" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Region / State</label>
+          <input type="text" name="region" value="{{ form.region.value|default:'' }}" class="{{ form.region.field.widget.attrs.class }}" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">City</label>
+          <input type="text" name="city" value="{{ form.city.value|default:'' }}" class="{{ form.city.field.widget.attrs.class }}" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Postal Code</label>
+          <input type="text" name="postal_code" value="{{ form.postal_code.value|default:'' }}" class="{{ form.postal_code.field.widget.attrs.class }}" />
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Street Address</label>
+          <input type="text" name="address" value="{{ form.address.value|default:'' }}" class="{{ form.address.field.widget.attrs.class }}" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Financials -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6 mb-5">
+      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-5">Financials</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Balance ($)</label>
+          <input type="number" name="balance" value="{{ form.balance.value|default:'0' }}" step="0.01" class="{{ form.balance.field.widget.attrs.class }}" />
+          {% for e in form.balance.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Profit ($)</label>
+          <input type="number" name="profit" value="{{ form.profit.value|default:'0' }}" step="0.01" class="{{ form.profit.field.widget.attrs.class }}" />
+          {% for e in form.profit.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">
+            Portfolio Target ($)
+            <span class="ml-1 text-indigo-500 cursor-help" title="Used for the portfolio growth progress bar on the user's dashboard">?</span>
+          </label>
+          <input type="number" name="target" value="{{ form.target.value|default:'50000' }}" step="0.01" class="{{ form.target.field.widget.attrs.class }}" />
+          {% for e in form.target.errors %}<p class="text-xs text-red-500 mt-1">{{ e }}</p>{% endfor %}
+          <p class="text-xs text-gray-400 mt-1">Progress bar target for the user's portfolio page</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loyalty -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6 mb-5">
+      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-5">Loyalty Tier</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Current Tier</label>
+          <select name="current_loyalty_status" class="{{ form.current_loyalty_status.field.widget.attrs.class }}">
+            {% for val, label in form.current_loyalty_status.field.choices %}
+              <option value="{{ val }}" {% if form.current_loyalty_status.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Next Tier</label>
+          <select name="next_loyalty_status" class="{{ form.next_loyalty_status.field.widget.attrs.class }}">
+            {% for val, label in form.next_loyalty_status.field.choices %}
+              <option value="{{ val }}" {% if form.next_loyalty_status.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Amount to Next Tier ($)</label>
+          <input type="number" name="next_amount_to_upgrade" value="{{ form.next_amount_to_upgrade.value|default:'5000' }}" step="0.01" class="{{ form.next_amount_to_upgrade.field.widget.attrs.class }}" />
+        </div>
+      </div>
+    </div>
+
+    <!-- KYC -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6 mb-5">
+      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-5">KYC Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
+          <select name="title" class="{{ form.title.field.widget.attrs.class }}">
+            {% for val, label in form.title.field.choices %}
+              <option value="{{ val }}" {% if form.title.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">ID Type</label>
+          <select name="id_type" class="{{ form.id_type.field.widget.attrs.class }}">
+            {% for val, label in form.id_type.field.choices %}
+              <option value="{{ val }}" {% if form.id_type.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Employment Status</label>
+          <select name="status_of_employment" class="{{ form.status_of_employment.field.widget.attrs.class }}">
+            {% for val, label in form.status_of_employment.field.choices %}
+              <option value="{{ val }}" {% if form.status_of_employment.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Source of Income</label>
+          <select name="source_of_income" class="{{ form.source_of_income.field.widget.attrs.class }}">
+            {% for val, label in form.source_of_income.field.choices %}
+              <option value="{{ val }}" {% if form.source_of_income.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Industry</label>
+          <select name="industry" class="{{ form.industry.field.widget.attrs.class }}">
+            {% for val, label in form.industry.field.choices %}
+              <option value="{{ val }}" {% if form.industry.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Education Level</label>
+          <select name="level_of_education" class="{{ form.level_of_education.field.widget.attrs.class }}">
+            {% for val, label in form.level_of_education.field.choices %}
+              <option value="{{ val }}" {% if form.level_of_education.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Annual Income</label>
+          <select name="annual_amount" class="{{ form.annual_amount.field.widget.attrs.class }}">
+            {% for val, label in form.annual_amount.field.choices %}
+              <option value="{{ val }}" {% if form.annual_amount.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Estimated Net Worth</label>
+          <select name="estimated_net_worth" class="{{ form.estimated_net_worth.field.widget.attrs.class }}">
+            {% for val, label in form.estimated_net_worth.field.choices %}
+              <option value="{{ val }}" {% if form.estimated_net_worth.value == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Permissions -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6 mb-5">
+      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-5">Permissions & Flags</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="is_active" {% if form.is_active.value %}checked{% endif %} class="{{ form.is_active.field.widget.attrs.class }}" />
+          <span class="text-sm text-gray-700">Active</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="is_verified" {% if form.is_verified.value %}checked{% endif %} class="{{ form.is_verified.field.widget.attrs.class }}" />
+          <span class="text-sm text-gray-700">KYC Verified</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="email_verified" {% if form.email_verified.value %}checked{% endif %} class="{{ form.email_verified.field.widget.attrs.class }}" />
+          <span class="text-sm text-gray-700">Email Verified</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="can_transfer" {% if form.can_transfer.value %}checked{% endif %} class="{{ form.can_transfer.field.widget.attrs.class }}" />
+          <span class="text-sm text-gray-700">Can Transfer</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="two_factor_enabled" {% if form.two_factor_enabled.value %}checked{% endif %} class="{{ form.two_factor_enabled.field.widget.attrs.class }}" />
+          <span class="text-sm text-gray-700">2FA Enabled</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="is_staff" {% if form.is_staff.value %}checked{% endif %} class="{{ form.is_staff.field.widget.attrs.class }}" />
+          <span class="text-sm text-gray-700">Staff / Admin</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="show_portfolio_growth" {% if form.show_portfolio_growth.value %}checked{% endif %} class="{{ form.show_portfolio_growth.field.widget.attrs.class }}" />
+          <span class="text-sm text-gray-700">Show Portfolio Growth</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-6">
+      <h3 class="text-sm font-semibold text-amber-800 uppercase tracking-wider mb-1">Reset Password <span class="text-xs font-normal normal-case text-amber-600">(dev only — leave blank to keep current)</span></h3>
+      <p class="text-xs text-amber-700 mb-3">Current stored: <span class="font-mono">{{ view_user.pass_plain_text|default:"not stored" }}</span></p>
+      <input type="text" name="new_password" value="" class="{{ form.new_password.field.widget.attrs.class }}" placeholder="New plain-text password" autocomplete="new-password" />
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition">
+        <i class="fas fa-save mr-1.5"></i>Save Changes
+      </button>
+      <a href="{% url 'dashboard:user_detail' view_user.id %}" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-semibold hover:bg-gray-200 transition">
+        Cancel
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

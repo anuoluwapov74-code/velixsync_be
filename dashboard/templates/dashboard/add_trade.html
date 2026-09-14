@@ -1,0 +1,49 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Add Trade - VelixSync Admin{% endblock %}
+{% block page_title %}Add Trade{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <h3 class="font-semibold text-gray-800 mb-6">Create a New Trade</h3>
+        <form method="post">{% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.user_email.label }}</label>{{ form.user_email }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.entry.label }}</label>{{ form.entry }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.asset_type.label }}</label>{{ form.asset_type }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.asset.label }}</label>{{ form.asset }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.direction.label }}</label>{{ form.direction }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.profit.label }}</label>{{ form.profit }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.duration.label }}</label>{{ form.duration }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.rate.label }}</label>{{ form.rate }}</div>
+            </div>
+            <button type="submit" class="mt-6 px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Add Trade</button>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.getElementById('id_asset_type')?.addEventListener('change', function(){
+    const type = this.value;
+    if(!type) return;
+    fetch('{% url "dashboard:get_assets_by_type" %}?type=' + type)
+        .then(r => r.json())
+        .then(data => {
+            const assetInput = document.getElementById('id_asset');
+            if(data.assets.length > 0) {
+                const select = document.createElement('select');
+                select.name = 'asset';
+                select.id = 'id_asset';
+                select.className = assetInput.className;
+                select.innerHTML = '<option value="">Select Asset</option>';
+                data.assets.forEach(a => {
+                    select.innerHTML += '<option value="'+a.value+'">'+a.label+'</option>';
+                });
+                assetInput.replaceWith(select);
+            }
+        });
+});
+</script>
+{% endblock %}
+{% endblock %}

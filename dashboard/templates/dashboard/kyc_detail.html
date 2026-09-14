@@ -1,0 +1,96 @@
+{% extends "dashboard/base.html" %}
+{% block title %}KYC Review - {{ view_user.email }}{% endblock %}
+{% block page_title %}KYC Review{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- User Info -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-xl font-bold">{{ view_user.email|first|upper }}</div>
+            <div>
+                <h3 class="font-semibold text-gray-800">{{ view_user.get_title_display|default:"" }} {{ view_user.first_name }} {{ view_user.last_name }}</h3>
+                <p class="text-sm text-gray-500">{{ view_user.email }}</p>
+            </div>
+        </div>
+        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Personal Information</h4>
+        <div class="space-y-0 text-sm">
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Account ID</span><span class="font-mono">{{ view_user.account_id }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Title</span><span class="capitalize">{{ view_user.get_title_display|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">First Name</span><span>{{ view_user.first_name|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Last Name</span><span>{{ view_user.last_name|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Date of Birth</span><span>{{ view_user.dob|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Country</span><span>{{ view_user.country|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2"><span class="text-gray-500">Status</span>
+                {% if view_user.is_verified %}<span class="px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700">Approved</span>
+                {% else %}<span class="px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-700">Pending Review</span>{% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Information -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Financial Information</h4>
+        <div class="space-y-0 text-sm">
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Currency</span><span>{{ view_user.currency|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Employment Status</span><span class="capitalize">{{ view_user.get_status_of_employment_display|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Source of Income</span><span class="capitalize">{{ view_user.get_source_of_income_display|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Industry</span><span class="capitalize">{{ view_user.get_industry_display|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Education Level</span><span class="capitalize">{{ view_user.get_level_of_education_display|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Annual Amount</span><span>{{ view_user.get_annual_amount_display|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2"><span class="text-gray-500">Est. Net Worth</span><span>{{ view_user.get_estimated_net_worth_display|default:"N/A" }}</span></div>
+        </div>
+
+        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 mt-6">Address & Contact</h4>
+        <div class="space-y-0 text-sm">
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Street Address</span><span class="text-right max-w-[200px] truncate">{{ view_user.address|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">City</span><span>{{ view_user.city|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Province/State</span><span>{{ view_user.region|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2 border-b border-gray-100"><span class="text-gray-500">Zipcode</span><span>{{ view_user.postal_code|default:"N/A" }}</span></div>
+            <div class="flex justify-between py-2"><span class="text-gray-500">Phone</span><span>{{ view_user.phone|default:"N/A" }}</span></div>
+        </div>
+    </div>
+
+    <!-- ID Documents -->
+    <div class="space-y-4">
+        <div class="bg-white rounded-xl border border-gray-200/60 p-4">
+            <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Identity Verification</h4>
+            <div class="text-sm mb-4">
+                <div class="flex justify-between py-2"><span class="text-gray-500">ID Type</span><span class="capitalize">{{ view_user.get_id_type_display|default:"N/A" }}</span></div>
+            </div>
+        </div>
+        {% if view_user.id_front %}
+        <div class="bg-white rounded-xl border border-gray-200/60 p-4">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">ID Front</h4>
+            <img src="{{ view_user.id_front.url }}" alt="ID Front" class="w-full rounded-lg border border-gray-200">
+        </div>
+        {% endif %}
+        {% if view_user.id_back %}
+        <div class="bg-white rounded-xl border border-gray-200/60 p-4">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">ID Back</h4>
+            <img src="{{ view_user.id_back.url }}" alt="ID Back" class="w-full rounded-lg border border-gray-200">
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Approval Form -->
+{% if not view_user.is_verified %}
+<div class="bg-white rounded-xl border border-gray-200/60 p-6 mt-6">
+    <h4 class="text-sm font-semibold text-gray-700 mb-4">Take Action</h4>
+    <form method="post">{% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.action.label }}</label>
+                {{ form.action }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.admin_notes.label }}</label>
+                {{ form.admin_notes }}
+            </div>
+        </div>
+        <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Submit Decision</button>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

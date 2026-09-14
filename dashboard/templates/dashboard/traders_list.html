@@ -1,0 +1,432 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Pro Traders - VelixSync Admin{% endblock %}
+{% block page_title %}Professional Traders{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="mb-4 space-y-2">
+    {% for message in messages %}
+    <div class="px-4 py-3 rounded-lg text-sm font-medium {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border border-emerald-200{% else %}bg-red-50 text-red-800 border border-red-200{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Filters (client-side) -->
+<div class="bg-white rounded-xl border border-gray-200/60 p-4 mb-6">
+    <div class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input type="text" id="search-input" placeholder="Search by name, username, country…"
+                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+        </div>
+        <select id="badge-filter" class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+            <option value="">All Badges</option>
+            <option value="gold">Gold</option>
+            <option value="silver">Silver</option>
+            <option value="bronze">Bronze</option>
+        </select>
+        <select id="active-filter" class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+        </select>
+        <a href="{% url 'dashboard:add_trader' %}" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-500 transition text-center whitespace-nowrap">+ Add Trader</a>
+    </div>
+</div>
+
+<!-- Bulk form wraps the table so checkboxes + modal fields submit together -->
+<form id="bulk-form" method="post" action="{% url 'dashboard:bulk_update_trader_stats' %}">
+    {% csrf_token %}
+    <!-- trader_ids injected dynamically on submit -->
+
+    <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+        <!-- Toolbar -->
+        <div class="px-5 py-3 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="select-all" class="w-4 h-4 rounded text-indigo-600">
+                <label for="select-all" class="text-sm text-gray-600 select-none cursor-pointer">Select All Visible</label>
+                <span id="selected-count" class="text-xs text-gray-400">(0 selected)</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="page-info" class="text-xs text-gray-400"></span>
+                <button type="button" id="bulk-btn"
+                    class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled onclick="openModal()">
+                    <i class="fas fa-chart-line mr-1"></i> Change Trader Stats
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[900px]">
+                <thead>
+                    <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                        <th class="px-5 py-3 w-10"></th>
+                        <th class="px-5 py-3">Trader</th>
+                        <th class="px-5 py-3">Badge</th>
+                        <th class="px-5 py-3">Gain %</th>
+                        <th class="px-5 py-3">Win Rate</th>
+                        <th class="px-5 py-3">Copiers</th>
+                        <th class="px-5 py-3">Trades</th>
+                        <th class="px-5 py-3">Status</th>
+                        <th class="px-5 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100" id="trader-tbody">
+                    {% for t in traders %}
+                    <tr class="trader-row hover:bg-gray-50"
+                        data-search="{{ t.name|lower }} {{ t.username|lower }} {{ t.country|lower }}"
+                        data-badge="{{ t.badge }}"
+                        data-active="{% if t.is_active %}active{% else %}inactive{% endif %}">
+                        <td class="px-5 py-3">
+                            <input type="checkbox" class="trader-checkbox w-4 h-4 rounded text-indigo-600" value="{{ t.id }}">
+                        </td>
+                        <td class="px-5 py-3">
+                            <div class="flex items-center gap-3">
+                                {% if t.avatar %}<img src="{{ t.avatar.url }}" class="w-9 h-9 rounded-full object-cover">{% else %}<div class="w-9 h-9 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-sm font-bold">{{ t.name|first }}</div>{% endif %}
+                                <div>
+                                    <p class="font-medium text-gray-800">{{ t.name }}</p>
+                                    <p class="text-xs text-gray-400">{{ t.username }} &middot; {{ t.country }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium capitalize {% if t.badge == 'gold' %}bg-yellow-50 text-yellow-700{% elif t.badge == 'silver' %}bg-gray-100 text-gray-600{% else %}bg-orange-50 text-orange-700{% endif %}">{{ t.badge }}</span>
+                        </td>
+                        <td class="px-5 py-3 font-semibold text-emerald-600">{{ t.gain|floatformat:0 }}%</td>
+                        <td class="px-5 py-3">{{ t.win_rate|floatformat:1 }}%</td>
+                        <td class="px-5 py-3">{{ t.copiers }}</td>
+                        <td class="px-5 py-3">{{ t.trades }}</td>
+                        <td class="px-5 py-3">
+                            {% if t.is_active %}<span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span><span class="text-xs text-emerald-600 ml-1">Active</span>
+                            {% else %}<span class="w-2 h-2 rounded-full bg-gray-300 inline-block"></span><span class="text-xs text-gray-400 ml-1">Inactive</span>{% endif %}
+                        </td>
+                        <td class="px-5 py-3">
+                            <div class="flex gap-1">
+                                <a href="{% url 'dashboard:trader_detail' t.id %}" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded text-xs font-medium hover:bg-indigo-100 transition">View</a>
+                                <a href="{% url 'dashboard:edit_trader' t.id %}" class="px-2.5 py-1 bg-gray-50 text-gray-600 rounded text-xs font-medium hover:bg-gray-100 transition">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="no-results-row" class="hidden">
+                        <td colspan="9" class="px-5 py-12 text-center text-gray-400">
+                            <i class="fas fa-search text-2xl mb-2 block"></i>
+                            No traders match your filters.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between mt-4" id="pagination-bar">
+        <div class="text-xs text-gray-400" id="pagination-label"></div>
+        <div class="flex gap-1 flex-wrap" id="pagination-btns"></div>
+    </div>
+</form>
+
+<!-- Stats Modal -->
+<div id="stats-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col max-h-[90vh]">
+        <!-- Fixed header -->
+        <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100 flex-shrink-0">
+            <h3 class="text-lg font-bold text-gray-800">Increase Trader Stats</h3>
+            <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Scrollable body -->
+        <div class="overflow-y-auto flex-1 px-6 py-4">
+            <p class="text-sm text-gray-500 mb-5">
+                Enter a % to increase each stat for all <span id="modal-count" class="font-semibold text-indigo-600">0</span> selected trader(s).
+                Leave at 0% to skip a field.
+            </p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Gain %</label>
+                    <div class="relative">
+                        <input type="number" name="gain_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Return YTD %</label>
+                    <div class="relative">
+                        <input type="number" name="return_ytd_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Return 2 Years %</label>
+                    <div class="relative">
+                        <input type="number" name="return_2y_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Win Rate %</label>
+                    <div class="relative">
+                        <input type="number" name="win_rate_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">Increases total wins by this %, which raises win rate.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Total Trades %</label>
+                    <div class="relative">
+                        <input type="number" name="trades_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Copiers %</label>
+                    <div class="relative">
+                        <input type="number" name="copiers_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Profit Share %</label>
+                    <div class="relative">
+                        <input type="number" name="profit_share_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Followers %</label>
+                    <div class="relative">
+                        <input type="number" name="followers_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Minimum Capital %</label>
+                    <div class="relative">
+                        <input type="number" name="min_capital_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed footer -->
+        <div class="flex gap-3 px-6 py-4 border-t border-gray-100 flex-shrink-0">
+            <button type="button" onclick="closeModal()"
+                class="flex-1 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 transition">
+                Cancel
+            </button>
+            <button type="button" onclick="submitBulkForm()"
+                class="flex-1 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500 transition">
+                Apply Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+const PER_PAGE = 25;
+const selectedIds = new Set();
+let allRows = [];
+let filteredRows = [];
+let currentPage = 1;
+
+function init() {
+    allRows = Array.from(document.querySelectorAll('.trader-row'));
+
+    document.getElementById('select-all').addEventListener('change', function () {
+        getPageRows().forEach(row => {
+            const cb = row.querySelector('.trader-checkbox');
+            cb.checked = this.checked;
+            if (this.checked) selectedIds.add(cb.value);
+            else selectedIds.delete(cb.value);
+        });
+        updateUI();
+    });
+
+    document.querySelectorAll('.trader-checkbox').forEach(cb => {
+        cb.addEventListener('change', function () {
+            if (this.checked) selectedIds.add(this.value);
+            else selectedIds.delete(this.value);
+            updateUI();
+        });
+    });
+
+    document.getElementById('search-input').addEventListener('input', () => { currentPage = 1; applyFilters(); });
+    document.getElementById('badge-filter').addEventListener('change', () => { currentPage = 1; applyFilters(); });
+    document.getElementById('active-filter').addEventListener('change', () => { currentPage = 1; applyFilters(); });
+
+    applyFilters();
+}
+
+function applyFilters() {
+    const q = document.getElementById('search-input').value.trim().toLowerCase();
+    const badge = document.getElementById('badge-filter').value;
+    const active = document.getElementById('active-filter').value;
+
+    filteredRows = allRows.filter(row => {
+        const matchQ = !q || row.dataset.search.includes(q);
+        const matchBadge = !badge || row.dataset.badge === badge;
+        const matchActive = !active || row.dataset.active === active;
+        return matchQ && matchBadge && matchActive;
+    });
+
+    renderPage();
+}
+
+function renderPage() {
+    const total = filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * PER_PAGE;
+    const end = start + PER_PAGE;
+    const pageRows = filteredRows.slice(start, end);
+
+    allRows.forEach(row => row.classList.add('hidden'));
+    pageRows.forEach(row => {
+        row.classList.remove('hidden');
+        const cb = row.querySelector('.trader-checkbox');
+        cb.checked = selectedIds.has(cb.value);
+    });
+
+    document.getElementById('no-results-row').classList.toggle('hidden', total > 0);
+
+    const startLabel = total === 0 ? 0 : start + 1;
+    document.getElementById('pagination-label').textContent =
+        `Showing ${startLabel}–${Math.min(end, total)} of ${total} traders`;
+    document.getElementById('page-info').textContent =
+        total > PER_PAGE ? `Page ${currentPage} of ${totalPages}` : '';
+
+    renderPaginationBtns(totalPages);
+    updateUI();
+}
+
+function getPageRows() {
+    const start = (currentPage - 1) * PER_PAGE;
+    return filteredRows.slice(start, start + PER_PAGE);
+}
+
+function renderPaginationBtns(totalPages) {
+    const container = document.getElementById('pagination-btns');
+    container.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    const makeBtn = (label, page, disabled, active) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = label;
+        btn.className = [
+            'px-3 py-1.5 text-xs rounded-lg font-medium transition',
+            active ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50',
+            disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : '',
+        ].join(' ');
+        if (!disabled) btn.addEventListener('click', () => { currentPage = page; renderPage(); });
+        return btn;
+    };
+
+    container.appendChild(makeBtn('‹', currentPage - 1, currentPage === 1, false));
+
+    let pages = [];
+    if (totalPages <= 7) {
+        pages = Array.from({ length: totalPages }, (_, i) => i + 1);
+    } else {
+        pages = [1];
+        if (currentPage > 3) pages.push('...');
+        for (let p = Math.max(2, currentPage - 1); p <= Math.min(totalPages - 1, currentPage + 1); p++) pages.push(p);
+        if (currentPage < totalPages - 2) pages.push('...');
+        pages.push(totalPages);
+    }
+
+    pages.forEach(p => {
+        if (p === '...') {
+            const el = document.createElement('span');
+            el.textContent = '…';
+            el.className = 'px-2 py-1.5 text-xs text-gray-400';
+            container.appendChild(el);
+        } else {
+            container.appendChild(makeBtn(p, p, false, p === currentPage));
+        }
+    });
+
+    container.appendChild(makeBtn('›', currentPage + 1, currentPage === totalPages, false));
+}
+
+function updateUI() {
+    const count = selectedIds.size;
+    document.getElementById('selected-count').textContent = `(${count} selected)`;
+    document.getElementById('bulk-btn').disabled = count === 0;
+
+    const pageCbs = getPageRows().map(row => row.querySelector('.trader-checkbox'));
+    const allChecked = pageCbs.length > 0 && pageCbs.every(cb => cb.checked);
+    const someChecked = pageCbs.some(cb => cb.checked);
+    const selAll = document.getElementById('select-all');
+    selAll.checked = allChecked;
+    selAll.indeterminate = !allChecked && someChecked;
+}
+
+function openModal() {
+    document.getElementById('modal-count').textContent = selectedIds.size;
+    const modal = document.getElementById('stats-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeModal() {
+    const modal = document.getElementById('stats-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function submitBulkForm() {
+    const form = document.getElementById('bulk-form');
+
+    // Inject selected trader IDs
+    form.querySelectorAll('input[name="trader_ids"]').forEach(el => el.remove());
+    selectedIds.forEach(id => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'trader_ids';
+        input.value = id;
+        form.appendChild(input);
+    });
+
+    // Copy percentage fields from modal (they live outside <form>)
+    ['gain_pct', 'return_ytd_pct', 'return_2y_pct', 'win_rate_pct', 'trades_pct',
+     'copiers_pct', 'profit_share_pct', 'followers_pct', 'min_capital_pct'].forEach(name => {
+        form.querySelectorAll(`input[name="${name}"]`).forEach(el => el.remove());
+        const modalInput = document.querySelector(`#stats-modal input[name="${name}"]`);
+        if (modalInput) {
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = name;
+            hidden.value = modalInput.value;
+            form.appendChild(hidden);
+        }
+    });
+
+    form.submit();
+}
+
+document.getElementById('stats-modal').addEventListener('click', function (e) {
+    if (e.target === this) closeModal();
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+{% endblock %}

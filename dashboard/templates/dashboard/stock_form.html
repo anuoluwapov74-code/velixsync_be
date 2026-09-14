@@ -1,0 +1,110 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}{{ action }} Stock - VelixSync Admin{% endblock %}
+{% block page_title %}{{ action }} Stock / Asset{% endblock %}
+
+{% block content %}
+<div class="max-w-lg">
+    <div class="flex items-center gap-3 mb-6">
+        <a href="{% url 'dashboard:stocks_list' %}" class="text-sm text-gray-400 hover:text-gray-600 transition">
+            <i class="fas fa-arrow-left mr-1"></i> Back to Stocks
+        </a>
+    </div>
+
+    {% if form.errors %}
+    <div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-red-800 mb-2">Please correct the following errors:</h4>
+        <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+            {% for field in form %}{% for error in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}{% endfor %}
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-xl border border-gray-200/60 p-4 sm:p-6">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="flex flex-col gap-4 mb-6">
+
+                <!-- Image upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">{{ form.image.label }}</label>
+
+                    <!-- Current image preview (edit mode) -->
+                    {% if stock.image %}
+                    <div class="mb-3 flex items-center gap-3">
+                        <img id="current-preview" src="{{ stock.image.url }}"
+                            class="w-14 h-14 rounded-full object-cover border border-gray-200">
+                        <span class="text-xs text-gray-400">Current image — upload a new one to replace it</span>
+                    </div>
+                    {% endif %}
+
+                    <!-- Upload area -->
+                    <div class="relative">
+                        <label for="id_image"
+                            class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-indigo-400 hover:bg-indigo-50/30 transition">
+                            <div id="upload-placeholder" class="flex flex-col items-center gap-1 {% if stock.image %}hidden{% endif %}">
+                                <i class="fas fa-cloud-upload-alt text-2xl text-gray-400"></i>
+                                <span class="text-sm text-gray-500 font-medium">Click to upload logo</span>
+                                <span class="text-xs text-gray-400">PNG, JPG, WEBP up to 5MB</span>
+                            </div>
+                            <img id="new-preview" src="#" alt="preview"
+                                class="w-16 h-16 rounded-full object-cover hidden">
+                        </label>
+                        {{ form.image }}
+                    </div>
+                    {% if form.image.errors %}
+                    <p class="text-xs text-red-600 mt-1">{{ form.image.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.symbol.label }}</label>
+                    {{ form.symbol }}
+                    {% if form.symbol.errors %}<p class="text-xs text-red-600 mt-1">{{ form.symbol.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<p class="text-xs text-red-600 mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button type="submit"
+                    class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500 transition">
+                    {{ action }} Stock
+                </button>
+                <a href="{% if stock %}{% url 'dashboard:stock_detail' stock.id %}{% else %}{% url 'dashboard:stocks_list' %}{% endif %}"
+                    class="w-full sm:w-auto px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Hide the default file input, use the label as the click target */
+    #id_image { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+</style>
+
+<script>
+document.getElementById('id_image').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const preview = document.getElementById('new-preview');
+        const placeholder = document.getElementById('upload-placeholder');
+        preview.src = e.target.result;
+        preview.classList.remove('hidden');
+        placeholder.classList.add('hidden');
+        const cur = document.getElementById('current-preview');
+        if (cur) cur.classList.add('hidden');
+    };
+    reader.readAsDataURL(file);
+});
+</script>
+{% endblock %}

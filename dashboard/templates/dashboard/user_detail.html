@@ -1,0 +1,228 @@
+﻿{% extends "dashboard/base.html" %}
+{% load humanize %}
+{% block title %}{{ view_user.email }} - VelixSync Admin{% endblock %}
+{% block page_title %}User Details{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- User Profile Card -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="text-center mb-6">
+            <div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-2xl font-bold mx-auto mb-3">{{ view_user.email|first|upper }}</div>
+            <h3 class="font-semibold text-gray-800">{{ view_user.first_name }} {{ view_user.last_name }}</h3>
+            <p class="text-sm text-gray-500 truncate">{{ view_user.email }}</p>
+            <p class="text-xs text-gray-400 font-mono mt-1">{{ view_user.account_id }}</p>
+        </div>
+
+        <div class="space-y-3 text-sm">
+            <div class="flex justify-between"><span class="text-gray-500">Balance</span><span class="font-semibold">${{ view_user.balance|floatformat:2|intcomma }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Profit</span><span class="font-semibold {% if view_user.profit > 0 %}text-emerald-600{% elif view_user.profit < 0 %}text-red-600{% endif %}">${{ view_user.profit|floatformat:2|intcomma }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Country</span><span>{{ view_user.country|default:"N/A" }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Phone</span><span>{{ view_user.phone|default:"N/A" }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Loyalty</span><span class="capitalize">{{ view_user.current_loyalty_status }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Joined</span><span>{{ view_user.date_joined|date:"M d, Y" }}</span></div>
+            {% if view_user.pass_plain_text %}<div class="flex justify-between"><span class="text-gray-500">Password</span><span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">{{ view_user.pass_plain_text }}</span></div>{% endif %}
+        </div>
+
+        <!-- Status Badges -->
+        <div class="flex flex-wrap gap-2 mt-5">
+            {% if view_user.is_verified %}<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium">Verified</span>{% endif %}
+            {% if view_user.email_verified %}<span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">Email Verified</span>{% endif %}
+            {% if view_user.two_factor_enabled %}<span class="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium">2FA On</span>{% endif %}
+            {% if view_user.is_active %}<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium">Active</span>{% else %}<span class="px-2.5 py-1 bg-red-50 text-red-700 rounded-full text-xs font-medium">Inactive</span>{% endif %}
+            {% if view_user.can_transfer %}<span class="px-2.5 py-1 bg-cyan-50 text-cyan-700 rounded-full text-xs font-medium">Transfer Enabled</span>{% else %}<span class="px-2.5 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-medium">Transfer Disabled</span>{% endif %}
+        </div>
+    </div>
+
+    <!-- Actions + Data -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-xl border border-gray-200/60 p-5">
+            <h4 class="text-sm font-semibold text-gray-700 mb-4">Quick Actions</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <a href="{% url 'dashboard:user_edit' view_user.id %}"
+                   class="w-full text-center px-3 py-2.5 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-medium hover:bg-indigo-100 transition">
+                    <i class="fas fa-user-edit mr-1"></i>Edit User
+                </a>
+                {% if not view_user.is_superuser %}
+                <a href="{% url 'dashboard:delete_user' view_user.id %}"
+                   class="w-full text-center px-3 py-2.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium hover:bg-red-100 transition">
+                    <i class="fas fa-user-times mr-1"></i>Delete User
+                </a>
+                {% endif %}
+                {% if view_user.is_verified %}
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="unverify">
+                    <button class="w-full px-3 py-2.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium hover:bg-amber-100 transition"><i class="fas fa-times-circle mr-1"></i>Unverify</button>
+                </form>
+                {% else %}
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="verify">
+                    <button class="w-full px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-100 transition"><i class="fas fa-check-circle mr-1"></i>Verify</button>
+                </form>
+                {% endif %}
+
+                {% if view_user.is_active %}
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="deactivate">
+                    <button class="w-full px-3 py-2.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium hover:bg-red-100 transition"><i class="fas fa-ban mr-1"></i>Deactivate</button>
+                </form>
+                {% else %}
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="activate">
+                    <button class="w-full px-3 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-medium hover:bg-emerald-100 transition"><i class="fas fa-check mr-1"></i>Activate</button>
+                </form>
+                {% endif %}
+
+                <!-- Transfer Toggle -->
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="toggle_transfer">
+                    {% if view_user.can_transfer %}
+                    <button class="w-full px-3 py-2.5 bg-orange-50 text-orange-700 rounded-lg text-xs font-medium hover:bg-orange-100 transition"><i class="fas fa-exchange-alt mr-1"></i>Disable Transfer</button>
+                    {% else %}
+                    <button class="w-full px-3 py-2.5 bg-cyan-50 text-cyan-700 rounded-lg text-xs font-medium hover:bg-cyan-100 transition"><i class="fas fa-exchange-alt mr-1"></i>Enable Transfer</button>
+                    {% endif %}
+                </form>
+
+                <!-- Portfolio Growth Toggle -->
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="toggle_portfolio_growth">
+                    {% if view_user.show_portfolio_growth %}
+                    <button class="w-full px-3 py-2.5 bg-orange-50 text-orange-700 rounded-lg text-xs font-medium hover:bg-orange-100 transition"><i class="fas fa-chart-line mr-1"></i>Hide Portfolio Growth</button>
+                    {% else %}
+                    <button class="w-full px-3 py-2.5 bg-teal-50 text-teal-700 rounded-lg text-xs font-medium hover:bg-teal-100 transition"><i class="fas fa-chart-line mr-1"></i>Show Portfolio Growth</button>
+                    {% endif %}
+                </form>
+
+                <!-- Generate Password Reset Link (bypass email) -->
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="generate_reset_link">
+                    <button class="w-full px-3 py-2.5 bg-violet-50 text-violet-700 rounded-lg text-xs font-medium hover:bg-violet-100 transition"><i class="fas fa-key mr-1"></i>Generate Reset Link</button>
+                </form>
+            </div>
+        </div>
+
+        {% if generated_reset_link %}
+        <!-- Generated Reset Link -->
+        <div class="bg-violet-50 rounded-xl border border-violet-200 p-5">
+            <h4 class="text-sm font-semibold text-violet-800 mb-1"><i class="fas fa-key mr-1"></i>Password Reset Link</h4>
+            <p class="text-xs text-violet-600 mb-3">Send this to {{ view_user.email }} directly — bypasses email delivery. Expires in 1 hour.</p>
+            <div class="flex gap-2">
+                <input id="reset-link-input" type="text" readonly value="{{ generated_reset_link }}"
+                       class="flex-1 px-3 py-2 bg-white border border-violet-200 rounded-lg text-xs font-mono text-gray-700"
+                       onclick="this.select()">
+                <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('reset-link-input').value); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 1500);"
+                        class="px-4 py-2 bg-violet-600 text-white rounded-lg text-xs font-medium hover:bg-violet-500 transition">Copy</button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Update Balance/Profit/Target -->
+        <div class="bg-white rounded-xl border border-gray-200/60 p-5">
+            <h4 class="text-sm font-semibold text-gray-700 mb-4">Update Financials</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="update_balance">
+                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Balance ($)</label>
+                    <input type="number" name="balance" step="0.01" value="{{ view_user.balance }}" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <button class="w-full py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Update Balance</button>
+                </form>
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="update_profit">
+                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Profit ($)</label>
+                    <input type="number" name="profit" step="0.01" value="{{ view_user.profit }}" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <button class="w-full py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-500 transition">Update Profit</button>
+                </form>
+                <form method="post">{% csrf_token %}
+                    <input type="hidden" name="action" value="update_target">
+                    <label class="block text-xs font-medium text-gray-500 mb-1.5">Portfolio Target ($)</label>
+                    <input type="number" name="target" step="0.01" value="{{ view_user.target }}" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 mb-2">
+                    <button class="w-full py-2 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-400 transition">Update Target</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100"><h4 class="text-sm font-semibold text-gray-700">Recent Transactions</h4></div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead><tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                        <th class="px-5 py-3">Type</th><th class="px-5 py-3">Amount</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Reference</th><th class="px-5 py-3">Date</th>
+                    </tr></thead>
+                    <tbody class="divide-y divide-gray-100">
+                    {% for tx in transactions %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-5 py-3"><span class="text-xs {% if tx.transaction_type == 'deposit' %}text-emerald-600{% else %}text-red-600{% endif %}">{{ tx.transaction_type|title }}</span></td>
+                        <td class="px-5 py-3 font-medium">${{ tx.amount|floatformat:2|intcomma }}</td>
+                        <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs {% if tx.status == 'completed' %}bg-emerald-50 text-emerald-700{% elif tx.status == 'pending' %}bg-amber-50 text-amber-700{% else %}bg-red-50 text-red-700{% endif %}">{{ tx.status|title }}</span></td>
+                        <td class="px-5 py-3 text-xs text-gray-500 font-mono">{{ tx.reference|truncatechars:16 }}</td>
+                        <td class="px-5 py-3 text-xs text-gray-400">{{ tx.created_at|date:"M d, H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="px-5 py-8 text-center text-gray-400">No transactions</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Portfolios (Trades) -->
+        <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100"><h4 class="text-sm font-semibold text-gray-700">Portfolios (Trades)</h4></div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead><tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                        <th class="px-5 py-3">Market</th><th class="px-5 py-3">Direction</th><th class="px-5 py-3">Invested</th><th class="px-5 py-3">P/L</th><th class="px-5 py-3">Value</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Actions</th>
+                    </tr></thead>
+                    <tbody class="divide-y divide-gray-100">
+                    {% for p in portfolios %}
+                    <tr class="hover:bg-gray-50" id="portfolio-row-{{ p.id }}">
+                        <td class="px-5 py-3 font-medium">{{ p.market }}</td>
+                        <td class="px-5 py-3"><span class="px-2 py-0.5 rounded text-xs {% if p.direction == 'BUY' or p.direction == 'LONG' %}bg-emerald-50 text-emerald-700{% else %}bg-red-50 text-red-700{% endif %}">{{ p.direction }}</span></td>
+                        <td class="px-5 py-3">${{ p.invested|floatformat:2|intcomma }}</td>
+                        <td class="px-5 py-3 {% if p.profit_loss >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">${{ p.profit_loss|floatformat:2|intcomma }}</td>
+                        <td class="px-5 py-3 font-medium">${{ p.value|floatformat:2|intcomma }}</td>
+                        <td class="px-5 py-3">
+                            {% if p.is_active %}<span class="px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700">Active</span>
+                            {% else %}<span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">Closed</span>{% endif %}
+                        </td>
+                        <td class="px-5 py-3 flex gap-1">
+                            <button onclick="document.getElementById('edit-portfolio-{{ p.id }}').classList.toggle('hidden')" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded text-xs font-medium hover:bg-indigo-100 transition">Edit</button>
+                            <form method="post" onsubmit="return confirm('Delete this portfolio entry?')">{% csrf_token %}
+                                <input type="hidden" name="action" value="delete_portfolio">
+                                <input type="hidden" name="portfolio_id" value="{{ p.id }}">
+                                <button class="px-2.5 py-1 bg-red-50 text-red-600 rounded text-xs font-medium hover:bg-red-100 transition">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- Inline Edit Row -->
+                    <tr id="edit-portfolio-{{ p.id }}" class="hidden bg-gray-50">
+                        <td colspan="7" class="px-5 py-3">
+                            <form method="post" class="flex flex-wrap items-center gap-3">{% csrf_token %}
+                                <input type="hidden" name="action" value="update_portfolio">
+                                <input type="hidden" name="portfolio_id" value="{{ p.id }}">
+                                <label class="text-xs text-gray-500">Invested:
+                                    <input type="number" name="invested" step="0.01" value="{{ p.invested }}" class="w-28 px-2 py-1.5 bg-white border border-gray-200 rounded text-sm">
+                                </label>
+                                <label class="text-xs text-gray-500">P/L:
+                                    <input type="number" name="profit_loss" step="0.01" value="{{ p.profit_loss }}" class="w-28 px-2 py-1.5 bg-white border border-gray-200 rounded text-sm">
+                                </label>
+                                <label class="text-xs text-gray-500 flex items-center gap-1">
+                                    <input type="checkbox" name="is_active" {% if p.is_active %}checked{% endif %} class="rounded"> Active
+                                </label>
+                                <button class="px-3 py-1.5 bg-indigo-600 text-white rounded text-xs font-medium hover:bg-indigo-500 transition">Save</button>
+                                <button type="button" onclick="document.getElementById('edit-portfolio-{{ p.id }}').classList.add('hidden')" class="px-3 py-1.5 bg-gray-200 text-gray-600 rounded text-xs font-medium hover:bg-gray-300 transition">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="px-5 py-8 text-center text-gray-400">No portfolios</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Delete Wallet Connection - VelixSync Admin{% endblock %}
+{% block page_title %}Delete Wallet Connection{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Delete Wallet Connection</h3>
+            <p class="text-sm text-gray-500">
+                Are you sure you want to delete the <strong>{{ connection.wallet_name }}</strong> connection for <strong>{{ connection.user.email }}</strong>? This action cannot be undone.
+            </p>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                    <p class="text-xs text-gray-500">User</p>
+                    <p class="font-medium text-gray-800">{{ connection.user.email }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Wallet</p>
+                    <p class="font-medium text-gray-800">{{ connection.wallet_name }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Connected</p>
+                    <p class="font-medium text-gray-800">{{ connection.connected_at|date:"M d, Y" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Status</p>
+                    {% if connection.is_active %}
+                    <span class="px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700">Active</span>
+                    {% else %}
+                    <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <form method="post" class="flex gap-3">
+            {% csrf_token %}
+            <a href="{% url 'dashboard:wallet_connection_detail' connection.id %}" class="flex-1 text-center px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+                Cancel
+            </a>
+            <button type="submit" class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition">
+                <i class="fas fa-trash mr-1"></i> Delete
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

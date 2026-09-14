@@ -1,0 +1,35 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Add Wallet - VelixSync Admin{% endblock %}
+{% block page_title %}Add Admin Wallet{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-coins text-indigo-500"></i>Wallet Details</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.currency.label }}</label>{{ form.currency }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.amount.label }}</label>{{ form.amount }}</div>
+                <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.wallet_address.label }}</label>{{ form.wallet_address }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.qr_code.label }}</label>{{ form.qr_code }}</div>
+                <div class="flex items-center gap-3 pt-6">{{ form.is_active }}<label class="text-sm font-medium text-gray-600">{{ form.is_active.label }}</label></div>
+            </div>
+
+            {% if form.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                <ul class="text-sm text-red-600">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}<li>{{ field|title }}: {{ error }}</li>{% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="flex gap-3">
+                <button type="submit" class="px-8 py-3 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500 transition">Create Wallet</button>
+                <a href="{% url 'dashboard:wallets_list' %}" class="px-8 py-3 bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-200 transition">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

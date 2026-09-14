@@ -1,0 +1,38 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Delete {{ stock.symbol }} - VelixSync Admin{% endblock %}
+{% block page_title %}Delete Stock{% endblock %}
+
+{% block content %}
+<div class="max-w-lg">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="flex items-center gap-4 mb-4">
+            {% if stock.image %}
+                <img src="{{ stock.image.url }}" class="w-12 h-12 rounded-full object-cover border border-gray-200">
+            {% elif stock.logo_url %}
+                <img src="{{ stock.logo_url }}" class="w-12 h-12 rounded-full object-cover border border-gray-200">
+            {% else %}
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 font-bold">{{ stock.symbol|slice:":2" }}</div>
+            {% endif %}
+            <div>
+                <h3 class="text-lg font-semibold text-gray-800">Delete {{ stock.symbol }}?</h3>
+                <p class="text-sm text-gray-500">{{ stock.name }}</p>
+            </div>
+        </div>
+        <p class="text-sm text-gray-600 mb-6 bg-red-50 border border-red-200 rounded-lg p-3">
+            <i class="fas fa-exclamation-triangle text-red-500 mr-1"></i>
+            This will permanently remove <strong>{{ stock.symbol }}</strong> from the asset list. Any existing trades that used this ticker will not be affected, but it will no longer appear in the dropdown.
+        </p>
+        <form method="post" class="flex gap-3">
+            {% csrf_token %}
+            <button type="submit"
+                class="px-6 py-2.5 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-500 transition">
+                Yes, Delete
+            </button>
+            <a href="{% url 'dashboard:stock_detail' stock.id %}"
+                class="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+                Cancel
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

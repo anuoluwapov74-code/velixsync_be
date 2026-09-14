@@ -1,0 +1,99 @@
+﻿{% extends "dashboard/base.html" %}
+{% load humanize %}
+{% block title %}{{ investor.email }} - Investor - VelixSync Admin{% endblock %}
+{% block page_title %}Investor Detail{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Profile Card -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="text-center mb-5">
+            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-2xl font-bold mx-auto mb-3">{{ investor.email|first|upper }}</div>
+            <h3 class="font-semibold text-gray-800 text-lg">{{ investor.first_name }} {{ investor.last_name }}</h3>
+            <p class="text-sm text-gray-400">{{ investor.email }}</p>
+            <p class="text-xs text-gray-400 mt-1">Account: {{ investor.account_id|default:"—" }}</p>
+        </div>
+        <div class="space-y-2.5 text-sm">
+            <div class="flex justify-between"><span class="text-gray-500">Joined</span><span>{{ investor.date_joined|date:"M d, Y" }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">KYC</span>
+                <span class="px-2 py-0.5 rounded-full text-xs {% if investor.kyc_verified %}bg-emerald-50 text-emerald-700{% else %}bg-yellow-50 text-yellow-700{% endif %}">{% if investor.kyc_verified %}Verified{% else %}Pending{% endif %}</span>
+            </div>
+        </div>
+        <a href="{% url 'dashboard:user_detail' investor.id %}" class="block mt-5 text-center px-4 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">View Full Profile</a>
+    </div>
+
+    <!-- Stats + Deposits -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-white rounded-xl border border-gray-200/60 p-4 text-center">
+                <p class="text-2xl font-bold text-gray-800">{{ total_deposits }}</p>
+                <p class="text-xs text-gray-500">Total</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200/60 p-4 text-center">
+                <p class="text-2xl font-bold text-emerald-600">{{ completed_count }}</p>
+                <p class="text-xs text-gray-500">Completed</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200/60 p-4 text-center">
+                <p class="text-2xl font-bold text-yellow-600">{{ pending_count }}</p>
+                <p class="text-xs text-gray-500">Pending</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200/60 p-4 text-center">
+                <p class="text-2xl font-bold text-red-600">{{ failed_count }}</p>
+                <p class="text-xs text-gray-500">Failed</p>
+            </div>
+        </div>
+
+        <!-- Amount Summary -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white rounded-xl border border-gray-200/60 p-4">
+                <p class="text-xs text-gray-500 mb-1">Total Completed Amount</p>
+                <p class="text-xl font-bold text-emerald-600">${{ total_completed_amount|floatformat:2|intcomma }}</p>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200/60 p-4">
+                <p class="text-xs text-gray-500 mb-1">Total Pending Amount</p>
+                <p class="text-xl font-bold text-yellow-600">${{ total_pending_amount|floatformat:2|intcomma }}</p>
+            </div>
+        </div>
+
+        <!-- Deposit History -->
+        <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100"><h4 class="text-sm font-semibold text-gray-700">Deposit History</h4></div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead><tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                        <th class="px-5 py-3">ID</th>
+                        <th class="px-5 py-3">Amount</th>
+                        <th class="px-5 py-3">Method</th>
+                        <th class="px-5 py-3">Status</th>
+                        <th class="px-5 py-3">Date</th>
+                        <th class="px-5 py-3">Actions</th>
+                    </tr></thead>
+                    <tbody class="divide-y divide-gray-100">
+                    {% for dep in deposits %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-5 py-3 text-gray-500">#{{ dep.id }}</td>
+                        <td class="px-5 py-3 font-semibold">${{ dep.amount|floatformat:2|intcomma }}</td>
+                        <td class="px-5 py-3 text-gray-600">{{ dep.payment_method|default:"—" }}</td>
+                        <td class="px-5 py-3">
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium
+                                {% if dep.status == 'completed' %}bg-emerald-50 text-emerald-700
+                                {% elif dep.status == 'pending' %}bg-yellow-50 text-yellow-700
+                                {% else %}bg-red-50 text-red-700{% endif %}">{{ dep.status|title }}</span>
+                        </td>
+                        <td class="px-5 py-3 text-xs text-gray-400">{{ dep.created_at|date:"M d, Y H:i" }}</td>
+                        <td class="px-5 py-3">
+                            <a href="{% url 'dashboard:deposit_detail' dep.id %}" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded text-xs font-medium hover:bg-indigo-100 transition">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="px-5 py-8 text-center text-gray-400">No deposits found</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% include "dashboard/pagination.html" %}
+    </div>
+</div>
+{% endblock %}

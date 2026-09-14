@@ -1,0 +1,58 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Delete Card - VelixSync Admin{% endblock %}
+{% block page_title %}Delete Card{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Delete Card</h3>
+            <p class="text-sm text-gray-500">
+                Are you sure you want to delete this <strong>{{ card.get_card_type_display }}</strong> card ({{ card.masked_number }}) for <strong>{{ card.user.email }}</strong>? This action cannot be undone.
+            </p>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-4 mb-6">
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                    <p class="text-xs text-gray-500">User</p>
+                    <p class="font-medium text-gray-800">{{ card.user.email }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Card Type</p>
+                    <p class="font-medium text-gray-800">{{ card.get_card_type_display }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Number</p>
+                    <p class="font-medium text-gray-800 font-mono">{{ card.masked_number }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Cardholder</p>
+                    <p class="font-medium text-gray-800">{{ card.cardholder_name }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Expiry</p>
+                    <p class="font-medium text-gray-800">{{ card.expiry }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Added</p>
+                    <p class="font-medium text-gray-800">{{ card.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" class="flex gap-3">
+            {% csrf_token %}
+            <a href="{% url 'dashboard:card_detail' card.id %}" class="flex-1 text-center px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+                Cancel
+            </a>
+            <button type="submit" class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition">
+                <i class="fas fa-trash mr-1"></i> Delete
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

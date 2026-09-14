@@ -1,0 +1,64 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Edit Card #{{ card.id }} - VelixSync Admin{% endblock %}
+{% block page_title %}Edit Card{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'dashboard:card_detail' card.id %}" class="text-sm text-indigo-600 hover:text-indigo-500 transition">
+        <i class="fas fa-arrow-left mr-1"></i> Back to Card Detail
+    </a>
+</div>
+
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Edit Card #{{ card.id }}</h3>
+        <p class="text-sm text-gray-500 mb-6">User: {{ card.user.email }}</p>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.cardholder_name.label }}</label>
+                    {{ form.cardholder_name }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.card_number.label }}</label>
+                    {{ form.card_number }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.expiry_month.label }}</label>
+                    {{ form.expiry_month }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.expiry_year.label }}</label>
+                    {{ form.expiry_year }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.cvv.label }}</label>
+                    {{ form.cvv }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.card_type.label }}</label>
+                    {{ form.card_type }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.billing_address.label }}</label>
+                    {{ form.billing_address }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.billing_zip.label }}</label>
+                    {{ form.billing_zip }}
+                </div>
+            </div>
+            <div class="flex items-center gap-2 pt-2">
+                {{ form.is_default }}
+                <label class="text-sm text-gray-600">{{ form.is_default.label }}</label>
+            </div>
+            <div class="flex gap-3 pt-4">
+                <a href="{% url 'dashboard:card_detail' card.id %}" class="flex-1 text-center px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition">Cancel</a>
+                <button type="submit" class="flex-1 px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}User Trades - VelixSync Admin{% endblock %}
+{% block page_title %}User Trades{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="mb-4 space-y-2">
+    {% for message in messages %}
+    <div class="px-4 py-3 rounded-lg text-sm font-medium {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border border-emerald-200{% else %}bg-red-50 text-red-800 border border-red-200{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Stats strip -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-4 flex items-center gap-4">
+        <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center">
+            <i class="fas fa-users text-indigo-500"></i>
+        </div>
+        <div>
+            <p class="text-xl font-bold text-gray-800">{{ total_count }}</p>
+            <p class="text-xs text-gray-500">Total Users</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200/60 p-4 flex items-center gap-4">
+        <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center">
+            <i class="fas fa-chart-line text-emerald-500"></i>
+        </div>
+        <div>
+            <p class="text-xl font-bold text-gray-800">Direct Trades</p>
+            <p class="text-xs text-gray-500">Select users below to add trades</p>
+        </div>
+    </div>
+</div>
+
+<!-- Client-side search -->
+<div class="mb-4 flex flex-col sm:flex-row gap-3">
+    <input type="text" id="user-search" placeholder="Search by email, first name, last name…"
+        class="flex-1 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        oninput="filterUsers(this.value)">
+    <button type="button" onclick="document.getElementById('user-search').value=''; filterUsers('');"
+        class="px-5 py-2 bg-gray-100 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-200 transition">
+        Clear
+    </button>
+</div>
+
+<!-- Users table with bulk-select -->
+<form method="post" action="{% url 'dashboard:bulk_add_user_trade' %}" id="bulk-form">
+    {% csrf_token %}
+    <input type="hidden" name="stage" value="select_users">
+
+    <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+        <!-- Table toolbar -->
+        <div class="px-5 py-3 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="select-all" class="w-4 h-4 rounded text-indigo-600"
+                    onclick="toggleAll(this)">
+                <label for="select-all" class="text-sm text-gray-600 select-none cursor-pointer">Select All</label>
+                <span id="selected-count" class="text-xs text-gray-400">(0 selected)</span>
+            </div>
+            <button type="submit" id="bulk-btn"
+                class="px-5 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-500 transition disabled:opacity-50"
+                disabled>
+                <i class="fas fa-plus mr-1"></i> Add Trade for Selected
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                        <th class="px-5 py-3 w-10"></th>
+                        <th class="px-5 py-3">User</th>
+                        <th class="px-5 py-3">Email</th>
+                        <th class="px-5 py-3">Joined</th>
+                        <th class="px-5 py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for u in users %}
+                    <tr class="user-row hover:bg-gray-50 transition" data-search="{{ u.email|lower }} {{ u.first_name|lower }} {{ u.last_name|lower }}">
+                        <td class="px-5 py-3">
+                            <input type="checkbox" name="user_ids" value="{{ u.id }}"
+                                class="user-checkbox w-4 h-4 rounded text-indigo-600"
+                                onchange="updateBulkBtn()">
+                        </td>
+                        <td class="px-5 py-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-xs font-bold">
+                                    {{ u.email|first|upper }}
+                                </div>
+                                <span class="font-medium text-gray-800">{{ u.first_name }} {{ u.last_name }}</span>
+                            </div>
+                        </td>
+                        <td class="px-5 py-3 text-gray-600">{{ u.email }}</td>
+                        <td class="px-5 py-3 text-xs text-gray-400">{{ u.date_joined|date:"M d, Y" }}</td>
+                        <td class="px-5 py-3 flex gap-2">
+                            <a href="{% url 'dashboard:user_trade_detail' u.id %}"
+                                class="inline-block px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-medium transition">
+                                View Trades
+                            </a>
+                            <a href="{% url 'dashboard:add_user_trade' u.id %}"
+                                class="inline-block px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-medium transition">
+                                Add Trade
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr id="no-users-row">
+                        <td colspan="5" class="px-5 py-10 text-center text-gray-400">
+                            <i class="fas fa-users text-2xl mb-2 block"></i>
+                            No users found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if users %}
+                    <tr id="no-filter-empty" style="display:none">
+                        <td colspan="5" class="px-5 py-10 text-center text-gray-400">
+                            <i class="fas fa-search text-2xl mb-2 block"></i>
+                            No users match your search.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</form>
+
+<script>
+function toggleAll(masterCb) {
+    document.querySelectorAll('.user-row:not([style*="display: none"]) .user-checkbox').forEach(cb => cb.checked = masterCb.checked);
+    updateBulkBtn();
+}
+function updateBulkBtn() {
+    const checked = document.querySelectorAll('.user-checkbox:checked').length;
+    document.getElementById('selected-count').textContent = `(${checked} selected)`;
+    document.getElementById('bulk-btn').disabled = checked === 0;
+}
+function filterUsers(query) {
+    const q = query.toLowerCase().trim();
+    const rows = document.querySelectorAll('.user-row');
+    let visible = 0;
+    rows.forEach(row => {
+        const match = !q || row.dataset.search.includes(q);
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    const empty = document.getElementById('no-filter-empty');
+    if (empty) empty.style.display = visible === 0 ? '' : 'none';
+    // Uncheck master checkbox when filter changes
+    document.getElementById('select-all').checked = false;
+    updateBulkBtn();
+}
+</script>
+
+{% endblock %}

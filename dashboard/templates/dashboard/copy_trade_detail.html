@@ -1,0 +1,68 @@
+{% extends "dashboard/base.html" %}
+{% load humanize %}
+{% block title %}Copy Trade #{{ copy_trade.id }}{% endblock %}
+{% block page_title %}Copy Trade Details{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                {% if copy_trade.trader.avatar %}<img src="{{ copy_trade.trader.avatar.url }}" class="w-10 h-10 rounded-full object-cover">{% else %}<div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold">{{ copy_trade.trader.name|first }}</div>{% endif %}
+                <div>
+                    <h3 class="font-semibold text-gray-800">{{ copy_trade.trader.name }}</h3>
+                    <p class="text-xs text-gray-400">{{ copy_trade.trader.username }}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 rounded-full text-xs font-medium {% if copy_trade.status == 'open' %}bg-blue-50 text-blue-700{% else %}bg-gray-100 text-gray-600{% endif %}">{{ copy_trade.status|title }}</span>
+                <a href="{% url 'dashboard:edit_copy_trade' copy_trade.id %}" class="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-medium hover:bg-indigo-100 transition">Edit</a>
+                <a href="{% url 'dashboard:delete_copy_trade' copy_trade.id %}" class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition">Delete</a>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+            <div class="py-3 border-b border-gray-100"><p class="text-gray-500 text-xs mb-1">Market</p><p class="font-medium">{{ copy_trade.market }}</p></div>
+            <div class="py-3 border-b border-gray-100"><p class="text-gray-500 text-xs mb-1">Direction</p><p><span class="px-2 py-0.5 rounded text-xs {% if copy_trade.direction == 'buy' %}bg-emerald-50 text-emerald-700{% else %}bg-red-50 text-red-700{% endif %}">{{ copy_trade.direction|upper }}</span></p></div>
+            <div class="py-3 border-b border-gray-100"><p class="text-gray-500 text-xs mb-1">Duration</p><p>{{ copy_trade.duration }}</p></div>
+            <div class="py-3 border-b border-gray-100"><p class="text-gray-500 text-xs mb-1">Amount</p><p class="font-medium">${{ copy_trade.amount|floatformat:2|intcomma }}</p></div>
+            <div class="py-3 border-b border-gray-100"><p class="text-gray-500 text-xs mb-1">Entry</p><p>${{ copy_trade.entry_price|floatformat:2|intcomma }}</p></div>
+            <div class="py-3 border-b border-gray-100"><p class="text-gray-500 text-xs mb-1">Exit</p><p>{% if copy_trade.exit_price %}${{ copy_trade.exit_price|floatformat:2|intcomma }}{% else %}—{% endif %}</p></div>
+            <div class="py-3"><p class="text-gray-500 text-xs mb-1">P/L %</p><p class="text-lg font-bold {% if copy_trade.profit_loss_percent >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ copy_trade.profit_loss_percent }}%</p></div>
+            <div class="py-3"><p class="text-gray-500 text-xs mb-1">Opened</p><p>{{ copy_trade.opened_at|date:"M d, Y H:i" }}</p></div>
+            {% if copy_trade.closed_at %}<div class="py-3"><p class="text-gray-500 text-xs mb-1">Closed</p><p>{{ copy_trade.closed_at|date:"M d, Y H:i" }}</p></div>{% endif %}
+        </div>
+        {% if copy_trade.notes %}<div class="mt-4 pt-4 border-t border-gray-100"><p class="text-xs text-gray-500 mb-1">Notes</p><p class="text-sm text-gray-700">{{ copy_trade.notes }}</p></div>{% endif %}
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200/60 p-5">
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">Impact Summary</h4>
+        <div class="text-center py-4">
+            <p class="text-3xl font-bold text-indigo-600">{{ affected_users_count }}</p>
+            <p class="text-sm text-gray-500">Users Affected</p>
+        </div>
+    </div>
+</div>
+
+<!-- Affected Users -->
+{% if users_with_pl %}
+<div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-100"><h4 class="text-sm font-semibold text-gray-700">Affected Users & P/L</h4></div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead><tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                <th class="px-5 py-3">User</th><th class="px-5 py-3">Investment</th><th class="px-5 py-3">P/L Amount</th>
+            </tr></thead>
+            <tbody class="divide-y divide-gray-100">
+            {% for item in users_with_pl %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-5 py-3">{{ item.copy_relation.user.email }}</td>
+                <td class="px-5 py-3">${{ item.copy_relation.initial_investment_amount|floatformat:2|intcomma }}</td>
+                <td class="px-5 py-3 font-medium {% if item.is_profit %}text-emerald-600{% else %}text-red-600{% endif %}">${{ item.profit_loss|floatformat:2|intcomma }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+[Unit]
+Description=VelixSync Django Backend (Gunicorn)
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/velixsync/backend/velixsync
+EnvironmentFile=/var/www/velixsync/backend/velixsync/.env
+ExecStart=/var/www/velixsync/venv/bin/gunicorn \
+    --workers 3 \
+    --bind 127.0.0.1:8002 \
+    --timeout 120 \
+    --access-logfile /var/log/velixsync/gunicorn-access.log \
+    --error-logfile /var/log/velixsync/gunicorn-error.log \
+    velixsync.wsgi:application
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

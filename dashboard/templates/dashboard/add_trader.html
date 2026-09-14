@@ -1,0 +1,723 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Add Trader - VelixSync Admin{% endblock %}
+{% block page_title %}Add Professional Trader{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl">
+    <!-- Form errors -->
+    {% if form.errors %}
+    <div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-red-800 mb-2">Please correct the following errors:</h4>
+        <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+            {% for field in form %}
+                {% for error in field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-xl border border-gray-200/60 p-4 sm:p-6">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Preset Auto-fill -->
+            <div class="mb-8 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+                <h4 class="text-sm font-semibold text-indigo-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-magic text-indigo-500"></i>Auto-fill from Preset
+                </h4>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <select id="presetSelect" class="flex-1 px-4 py-2.5 bg-white border border-indigo-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">— Select a trader preset —</option>
+                        <option value="0">01 · Apex Quantitative</option>
+                        <option value="1">02 · Delta Sigma Pro</option>
+                        <option value="2">03 · Cipher Algo X</option>
+                        <option value="3">04 · Valor Capital</option>
+                        <option value="4">05 · Meridian Alpha</option>
+                        <option value="5">06 · Stellarpath Capital</option>
+                        <option value="6">07 · Nebula Ventures</option>
+                        <option value="7">08 · Ironclad Trading Co</option>
+                        <option value="8">09 · Zenith Edge</option>
+                        <option value="9">10 · Vermillion Capital</option>
+                        <option value="10">11 · Orion Flux Capital</option>
+                        <option value="11">12 · Kestrel Trading Group</option>
+                        <option value="12">13 · Solstice Markets</option>
+                        <option value="13">14 · Pyxis Alpha Fund</option>
+                        <option value="14">15 · Halverson Signal</option>
+                        <option value="15">16 · Cascadia Prime</option>
+                        <option value="16">17 · Thornwick Asset Management</option>
+                        <option value="17">18 · Vega Storm Capital</option>
+                        <option value="18">19 · Auric Systems</option>
+                        <option value="19">20 · Polaris Quant</option>
+                    </select>
+                    <button type="button" onclick="loadPreset()" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500 transition whitespace-nowrap">
+                        <i class="fas fa-download mr-1"></i> Load Preset
+                    </button>
+                </div>
+                <p class="text-xs text-indigo-400 mt-2">All fields will be filled automatically — review and edit before submitting.</p>
+            </div>
+
+            <!-- Basic Info -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-user text-indigo-500"></i>Basic Information
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<p class="text-xs text-red-600 mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<p class="text-xs text-red-600 mt-1">{{ form.username.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avatar.label }}</label>
+                    {{ form.avatar }}
+                    {% if form.avatar.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avatar.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.country_flag.label }}</label>
+                    {{ form.country_flag }}
+                    {% if form.country_flag.errors %}<p class="text-xs text-red-600 mt-1">{{ form.country_flag.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.country.label }}</label>
+                    {{ form.country }}
+                    {% if form.country.errors %}<p class="text-xs text-red-600 mt-1">{{ form.country.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.badge.label }}</label>
+                    {{ form.badge }}
+                    {% if form.badge.errors %}<p class="text-xs text-red-600 mt-1">{{ form.badge.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.bio.label }}</label>
+                    {{ form.bio }}
+                    {% if form.bio.errors %}<p class="text-xs text-red-600 mt-1">{{ form.bio.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Category & Display -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-tags text-blue-500"></i>Category & Display
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.category.label }}</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}<p class="text-xs text-red-600 mt-1">{{ form.category.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.trend_direction.label }}</label>
+                    {{ form.trend_direction }}
+                    {% if form.trend_direction.errors %}<p class="text-xs text-red-600 mt-1">{{ form.trend_direction.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">{{ form.tags.label }}</label>
+                    <p class="text-xs text-gray-500 mb-2">Add tags for this trader (e.g., "Trending Investors", "Rising Stars")</p>
+                    {{ form.tags }}
+                    {% if form.tags.errors %}<p class="text-xs text-red-600 mt-1">{{ form.tags.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Gain -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-chart-line text-emerald-500"></i>Gain
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.gain.label }}</label>
+                    {{ form.gain }}
+                    {% if form.gain.errors %}<p class="text-xs text-red-600 mt-1">{{ form.gain.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Risk & Time -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-shield-alt text-amber-500"></i>Risk & Time
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.risk.label }}</label>
+                    {{ form.risk }}
+                    {% if form.risk.errors %}<p class="text-xs text-red-600 mt-1">{{ form.risk.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avg_trade_time.label }}</label>
+                    {{ form.avg_trade_time }}
+                    {% if form.avg_trade_time.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avg_trade_time.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Copiers & Trades -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-users text-blue-500"></i>Copiers & Trades
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.copiers.label }}</label>
+                    {{ form.copiers }}
+                    {% if form.copiers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.copiers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.trades.label }}</label>
+                    {{ form.trades }}
+                    {% if form.trades.errors %}<p class="text-xs text-red-600 mt-1">{{ form.trades.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Performance Stats -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-trophy text-yellow-500"></i>Performance Stats
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avg_profit_percent.label }}</label>
+                    {{ form.avg_profit_percent }}
+                    {% if form.avg_profit_percent.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avg_profit_percent.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avg_loss_percent.label }}</label>
+                    {{ form.avg_loss_percent }}
+                    {% if form.avg_loss_percent.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avg_loss_percent.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.total_wins.label }}</label>
+                    {{ form.total_wins }}
+                    {% if form.total_wins.errors %}<p class="text-xs text-red-600 mt-1">{{ form.total_wins.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.total_losses.label }}</label>
+                    {{ form.total_losses }}
+                    {% if form.total_losses.errors %}<p class="text-xs text-red-600 mt-1">{{ form.total_losses.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Additional Stats -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-chart-bar text-purple-500"></i>Additional Stats
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.subscribers.label }}</label>
+                    {{ form.subscribers }}
+                    {% if form.subscribers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.subscribers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.followers.label }}</label>
+                    {{ form.followers }}
+                    {% if form.followers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.followers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.current_positions.label }}</label>
+                    {{ form.current_positions }}
+                    {% if form.current_positions.errors %}<p class="text-xs text-red-600 mt-1">{{ form.current_positions.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.expert_rating.label }}</label>
+                    {{ form.expert_rating }}
+                    {% if form.expert_rating.errors %}<p class="text-xs text-red-600 mt-1">{{ form.expert_rating.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-chart-pie text-green-500"></i>Performance Metrics
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.return_ytd.label }}</label>
+                    {{ form.return_ytd }}
+                    {% if form.return_ytd.errors %}<p class="text-xs text-red-600 mt-1">{{ form.return_ytd.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.return_2y.label }}</label>
+                    {{ form.return_2y }}
+                    {% if form.return_2y.errors %}<p class="text-xs text-red-600 mt-1">{{ form.return_2y.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avg_score_7d.label }}</label>
+                    {{ form.avg_score_7d }}
+                    {% if form.avg_score_7d.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avg_score_7d.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.profitable_weeks.label }}</label>
+                    {{ form.profitable_weeks }}
+                    {% if form.profitable_weeks.errors %}<p class="text-xs text-red-600 mt-1">{{ form.profitable_weeks.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.min_account_threshold.label }}</label>
+                    {{ form.min_account_threshold }}
+                    {% if form.min_account_threshold.errors %}<p class="text-xs text-red-600 mt-1">{{ form.min_account_threshold.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.profit_share.label }}</label>
+                    {{ form.profit_share }}
+                    {% if form.profit_share.errors %}<p class="text-xs text-red-600 mt-1">{{ form.profit_share.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Advanced Stats -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-cogs text-gray-500"></i>Advanced Stats
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.max_drawdown.label }}</label>
+                    {{ form.max_drawdown }}
+                    {% if form.max_drawdown.errors %}<p class="text-xs text-red-600 mt-1">{{ form.max_drawdown.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.cumulative_earnings_copiers.label }}</label>
+                    {{ form.cumulative_earnings_copiers }}
+                    {% if form.cumulative_earnings_copiers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.cumulative_earnings_copiers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.cumulative_copiers.label }}</label>
+                    {{ form.cumulative_copiers }}
+                    {% if form.cumulative_copiers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.cumulative_copiers.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Additional Trading Data -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-database text-indigo-500"></i>Additional Trading Data
+                <span class="text-xs font-normal text-gray-400">(Optional)</span>
+            </h4>
+            <div class="space-y-6 mb-8">
+
+                <!-- Portfolio Breakdown -->
+                <div class="rounded-lg border border-gray-200 p-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Portfolio Breakdown</label>
+                    <p class="text-xs text-gray-500 mb-3">Add different asset types and their percentage allocation</p>
+                    <div class="overflow-x-auto">{{ form.portfolio_breakdown }}</div>
+                    {% if form.portfolio_breakdown.errors %}<p class="text-xs text-red-600 mt-1">{{ form.portfolio_breakdown.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Top Traded Assets -->
+                <div class="rounded-lg border border-gray-200 p-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Top Traded Assets</label>
+                    <p class="text-xs text-gray-500 mb-3">Add the trader's most frequently traded assets with performance stats</p>
+                    <div class="overflow-x-auto">{{ form.top_traded }}</div>
+                    {% if form.top_traded.errors %}<p class="text-xs text-red-600 mt-1">{{ form.top_traded.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Monthly Performance Chart Data -->
+                <div class="rounded-lg border border-gray-200 p-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Performance Chart Data</label>
+                    <p class="text-xs text-gray-500 mb-3">Add monthly performance values for the chart</p>
+                    <div class="overflow-x-auto">{{ form.performance_data }}</div>
+                    {% if form.performance_data.errors %}<p class="text-xs text-red-600 mt-1">{{ form.performance_data.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Monthly Performance Percentages -->
+                <div class="rounded-lg border border-gray-200 p-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Monthly Performance Percentages</label>
+                    <p class="text-xs text-gray-500 mb-3">Add monthly performance as percentages</p>
+                    <div class="overflow-x-auto">{{ form.monthly_performance }}</div>
+                    {% if form.monthly_performance.errors %}<p class="text-xs text-red-600 mt-1">{{ form.monthly_performance.errors.0 }}</p>{% endif %}
+                </div>
+
+                <!-- Frequently Traded Assets -->
+                <div class="rounded-lg border border-gray-200 p-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Frequently Traded Assets</label>
+                    <p class="text-xs text-gray-500 mb-3">Add asset tickers that this trader frequently trades</p>
+                    <div class="overflow-x-auto">{{ form.frequently_traded }}</div>
+                    {% if form.frequently_traded.errors %}<p class="text-xs text-red-600 mt-1">{{ form.frequently_traded.errors.0 }}</p>{% endif %}
+                </div>
+
+            </div>
+
+            <!-- Status -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex flex-wrap items-center gap-2">
+                <i class="fas fa-toggle-on text-green-500"></i>Status
+            </h4>
+            <div class="mb-8">
+                <div class="flex items-center gap-3">
+                    {{ form.is_active }}
+                    <label class="text-sm font-medium text-gray-600">{{ form.is_active.label }}</label>
+                </div>
+                {% if form.is_active.errors %}<p class="text-xs text-red-600 mt-1">{{ form.is_active.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500 transition text-center">
+                    Add Trader
+                </button>
+                <a href="{% url 'dashboard:traders_list' %}" class="w-full sm:w-auto px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Include JSON Builder Scripts -->
+{% include "dashboard/json_builder_scripts.html" %}
+
+<script>
+const TRADER_PRESETS = [
+  // 0 — Apex Quantitative
+  { name:"Apex Quantitative", username:"apexquant", country:"United States", badge:"gold",
+    bio:"ApexQuant.io — Systematic options trader. 6+ years live. Consistent, disciplined, data-driven.",
+    category:"options", trend_direction:"upward", gain:"109717.00", risk:"4",
+    avg_trade_time:"1 week", copiers:362, trades:802, avg_profit_percent:"32.50",
+    avg_loss_percent:"4.20", total_wins:842, total_losses:103, subscribers:506, followers:0,
+    current_positions:0, expert_rating:"4.83", return_ytd:"57.60", return_2y:"301.10",
+    avg_score_7d:"9.10", profitable_weeks:"72.00", min_account_threshold:"100000.00",
+    profit_share:20, max_drawdown:"7.80",
+    cumulative_earnings_copiers:"24396605.00", cumulative_copiers:406,
+    portfolio_breakdown:[{name:"Options",percentage:61},{name:"Crypto",percentage:24},{name:"Stocks",percentage:10},{name:"Cash",percentage:5}],
+    top_traded:[{ticker:"TSLA",name:"Tesla Inc",avg_profit:25.6,avg_loss:-5.8,profitable_pct:74},{ticker:"AMZN",name:"Amazon.com Inc",avg_profit:14.9,avg_loss:-6.2,profitable_pct:72},{ticker:"BTC",name:"Bitcoin",avg_profit:28,avg_loss:-7,profitable_pct:78}],
+    frequently_traded:["AAPL","TSLA","NVDA","BTC","XRP","META","GOLD","OIL"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 1 — Delta Sigma Pro
+  { name:"Delta Sigma Pro", username:"deltasigma", country:"United Kingdom", badge:"gold",
+    bio:"DeltaSigmaPro.com — Volatility specialist. SPX & QQQ options. High win rate, low drawdown.",
+    category:"options", trend_direction:"upward", gain:"84320.00", risk:"3",
+    avg_trade_time:"3 days", copiers:418, trades:1044, avg_profit_percent:"28.70",
+    avg_loss_percent:"3.10", total_wins:951, total_losses:93, subscribers:620, followers:0,
+    current_positions:0, expert_rating:"4.91", return_ytd:"72.10", return_2y:"344.50",
+    avg_score_7d:"9.40", profitable_weeks:"81.00", min_account_threshold:"150000.00",
+    profit_share:20, max_drawdown:"3.80",
+    cumulative_earnings_copiers:"31200000.00", cumulative_copiers:512,
+    portfolio_breakdown:[{name:"Options",percentage:70},{name:"Stocks",percentage:18},{name:"Cash",percentage:12}],
+    top_traded:[{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:31.2,avg_loss:-4.1,profitable_pct:82},{ticker:"AAPL",name:"Apple Inc",avg_profit:18.4,avg_loss:-3.8,profitable_pct:79},{ticker:"SPX",name:"S&P 500 Index",avg_profit:24.6,avg_loss:-2.9,profitable_pct:84}],
+    frequently_traded:["NVDA","AAPL","SPX","QQQ","MSFT","AMZN","GOOG"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 2 — Cipher Algo X
+  { name:"Cipher Algo X", username:"cipheralgox", country:"Singapore", badge:"gold",
+    bio:"Algo-driven crypto and options hybrid system. Runs 24/7. No emotion, only edge.",
+    category:"crypto", trend_direction:"upward", gain:"63840.00", risk:"5",
+    avg_trade_time:"3 days", copiers:294, trades:933, avg_profit_percent:"31.80",
+    avg_loss_percent:"5.10", total_wins:824, total_losses:109, subscribers:441, followers:0,
+    current_positions:0, expert_rating:"4.77", return_ytd:"44.20", return_2y:"268.30",
+    avg_score_7d:"8.90", profitable_weeks:"79.00", min_account_threshold:"80000.00",
+    profit_share:20, max_drawdown:"5.10",
+    cumulative_earnings_copiers:"18750000.00", cumulative_copiers:338,
+    portfolio_breakdown:[{name:"Crypto",percentage:55},{name:"Options",percentage:33},{name:"Cash",percentage:12}],
+    top_traded:[{ticker:"BTC",name:"Bitcoin",avg_profit:34.5,avg_loss:-6.2,profitable_pct:81},{ticker:"ETH",name:"Ethereum",avg_profit:29.1,avg_loss:-5.8,profitable_pct:77},{ticker:"SOL",name:"Solana",avg_profit:41.2,avg_loss:-7.4,profitable_pct:73}],
+    frequently_traded:["BTC","ETH","SOL","XRP","AVAX","LINK","BNB"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 3 — Valor Capital
+  { name:"Valor Capital", username:"valorcap", country:"United States", badge:"gold",
+    bio:"ValorCapital.io — Growth equity and options. Clean entries, tight risk management.",
+    category:"stocks", trend_direction:"upward", gain:"49510.00", risk:"3",
+    avg_trade_time:"1 week", copiers:388, trades:793, avg_profit_percent:"29.40",
+    avg_loss_percent:"3.80", total_wins:725, total_losses:68, subscribers:570, followers:0,
+    current_positions:0, expert_rating:"4.88", return_ytd:"61.40", return_2y:"289.70",
+    avg_score_7d:"9.20", profitable_weeks:"76.00", min_account_threshold:"100000.00",
+    profit_share:20, max_drawdown:"4.60",
+    cumulative_earnings_copiers:"22100000.00", cumulative_copiers:444,
+    portfolio_breakdown:[{name:"Options",percentage:55},{name:"Stocks",percentage:25},{name:"Crypto",percentage:15},{name:"Cash",percentage:5}],
+    top_traded:[{ticker:"AAPL",name:"Apple Inc",avg_profit:22.3,avg_loss:-4.0,profitable_pct:80},{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:33.7,avg_loss:-4.9,profitable_pct:76},{ticker:"MSFT",name:"Microsoft Corp",avg_profit:19.8,avg_loss:-3.4,profitable_pct:82}],
+    frequently_traded:["AAPL","NVDA","MSFT","AMZN","META","TSLA","QQQ"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 4 — Meridian Alpha
+  { name:"Meridian Alpha", username:"meridianalpha", country:"United Kingdom", badge:"gold",
+    bio:"Futures and options hybrid. Macro-informed, technically executed. Running since 2019.",
+    category:"futures", trend_direction:"upward", gain:"38900.00", risk:"4",
+    avg_trade_time:"3 days", copiers:331, trades:871, avg_profit_percent:"26.10",
+    avg_loss_percent:"4.80", total_wins:778, total_losses:93, subscribers:495, followers:0,
+    current_positions:0, expert_rating:"4.72", return_ytd:"48.30", return_2y:"224.60",
+    avg_score_7d:"8.80", profitable_weeks:"70.00", min_account_threshold:"200000.00",
+    profit_share:20, max_drawdown:"6.20",
+    cumulative_earnings_copiers:"16400000.00", cumulative_copiers:388,
+    portfolio_breakdown:[{name:"Futures",percentage:48},{name:"Options",percentage:30},{name:"Stocks",percentage:14},{name:"Cash",percentage:8}],
+    top_traded:[{ticker:"ES",name:"E-mini S&P 500",avg_profit:22.8,avg_loss:-5.3,profitable_pct:74},{ticker:"NQ",name:"E-mini Nasdaq",avg_profit:27.4,avg_loss:-5.9,profitable_pct:71},{ticker:"CL",name:"Crude Oil Futures",avg_profit:19.1,avg_loss:-4.7,profitable_pct:68}],
+    frequently_traded:["ES","NQ","CL","GC","ZB","SI","HG"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 5 — Stellarpath Capital
+  { name:"Stellarpath Capital", username:"stellarpath", country:"Canada", badge:"gold",
+    bio:"StellarCapital.co — Verified since 2018. Long-term wealth compounders. Real trades, real results.",
+    category:"stocks", trend_direction:"upward", gain:"71240.00", risk:"3",
+    avg_trade_time:"2 weeks", copiers:512, trades:1102, avg_profit_percent:"35.10",
+    avg_loss_percent:"4.90", total_wins:918, total_losses:184, subscribers:703, followers:0,
+    current_positions:0, expert_rating:"4.96", return_ytd:"66.90", return_2y:"312.40",
+    avg_score_7d:"9.50", profitable_weeks:"77.00", min_account_threshold:"120000.00",
+    profit_share:20, max_drawdown:"4.90",
+    cumulative_earnings_copiers:"28900000.00", cumulative_copiers:590,
+    portfolio_breakdown:[{name:"Options",percentage:60},{name:"Stocks",percentage:28},{name:"Cash",percentage:12}],
+    top_traded:[{ticker:"AAPL",name:"Apple Inc",avg_profit:28.4,avg_loss:-4.3,profitable_pct:83},{ticker:"TSLA",name:"Tesla Inc",avg_profit:38.6,avg_loss:-6.1,profitable_pct:71},{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:42.1,avg_loss:-5.7,profitable_pct:77}],
+    frequently_traded:["AAPL","TSLA","NVDA","SPX","AMZN","GOOG","MSFT"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 6 — Nebula Ventures
+  { name:"Nebula Ventures", username:"nebulavx", country:"Australia", badge:"gold",
+    bio:"Cross-asset momentum trader. Options + crypto rotation model. 5 years live verified.",
+    category:"options", trend_direction:"upward", gain:"56180.00", risk:"5",
+    avg_trade_time:"1 week", copiers:447, trades:968, avg_profit_percent:"30.20",
+    avg_loss_percent:"5.60", total_wins:856, total_losses:112, subscribers:634, followers:0,
+    current_positions:0, expert_rating:"4.89", return_ytd:"53.70", return_2y:"277.80",
+    avg_score_7d:"9.00", profitable_weeks:"73.00", min_account_threshold:"90000.00",
+    profit_share:20, max_drawdown:"7.30",
+    cumulative_earnings_copiers:"20850000.00", cumulative_copiers:501,
+    portfolio_breakdown:[{name:"Options",percentage:58},{name:"Crypto",percentage:28},{name:"Stocks",percentage:14}],
+    top_traded:[{ticker:"QQQ",name:"Nasdaq ETF",avg_profit:26.7,avg_loss:-5.2,profitable_pct:76},{ticker:"ETH",name:"Ethereum",avg_profit:35.4,avg_loss:-6.8,profitable_pct:72},{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:31.9,avg_loss:-5.0,profitable_pct:79}],
+    frequently_traded:["QQQ","ETH","NVDA","BTC","META","AAPL","SOL"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 7 — Ironclad Trading Co
+  { name:"Ironclad Trading Co", username:"ironclad", country:"United States", badge:"gold",
+    bio:"IroncladeTrading.com — Blue chip stocks and index futures. Swing trader. Clean and consistent.",
+    category:"stocks", trend_direction:"upward", gain:"91440.00", risk:"4",
+    avg_trade_time:"1 week", copiers:503, trades:988, avg_profit_percent:"34.10",
+    avg_loss_percent:"3.90", total_wins:896, total_losses:92, subscribers:681, followers:0,
+    current_positions:0, expert_rating:"4.94", return_ytd:"69.30", return_2y:"318.40",
+    avg_score_7d:"9.30", profitable_weeks:"80.00", min_account_threshold:"175000.00",
+    profit_share:20, max_drawdown:"6.40",
+    cumulative_earnings_copiers:"26700000.00", cumulative_copiers:555,
+    portfolio_breakdown:[{name:"Stocks",percentage:45},{name:"Options",percentage:35},{name:"Futures",percentage:15},{name:"Cash",percentage:5}],
+    top_traded:[{ticker:"AAPL",name:"Apple Inc",avg_profit:27.3,avg_loss:-3.6,profitable_pct:84},{ticker:"AMZN",name:"Amazon.com Inc",avg_profit:22.8,avg_loss:-4.1,profitable_pct:80},{ticker:"ES",name:"E-mini S&P 500",avg_profit:19.4,avg_loss:-3.2,profitable_pct:83}],
+    frequently_traded:["AAPL","AMZN","MSFT","ES","NQ","SPX","GOOG"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 8 — Zenith Edge
+  { name:"Zenith Edge", username:"zenithedge", country:"Singapore", badge:"gold",
+    bio:"ZenithEdge.io — Crypto + options rotation. Asia-Pacific hours. Systematic and transparent.",
+    category:"crypto", trend_direction:"upward", gain:"44610.00", risk:"5",
+    avg_trade_time:"3 days", copiers:278, trades:814, avg_profit_percent:"27.30",
+    avg_loss_percent:"5.80", total_wins:700, total_losses:114, subscribers:402, followers:0,
+    current_positions:0, expert_rating:"4.81", return_ytd:"42.80", return_2y:"214.90",
+    avg_score_7d:"8.70", profitable_weeks:"74.00", min_account_threshold:"75000.00",
+    profit_share:20, max_drawdown:"8.90",
+    cumulative_earnings_copiers:"13200000.00", cumulative_copiers:310,
+    portfolio_breakdown:[{name:"Crypto",percentage:62},{name:"Options",percentage:26},{name:"Cash",percentage:12}],
+    top_traded:[{ticker:"BTC",name:"Bitcoin",avg_profit:29.8,avg_loss:-6.4,profitable_pct:78},{ticker:"SOL",name:"Solana",avg_profit:38.2,avg_loss:-7.9,profitable_pct:70},{ticker:"XRP",name:"Ripple",avg_profit:24.6,avg_loss:-5.5,profitable_pct:74}],
+    frequently_traded:["BTC","SOL","XRP","ETH","AVAX","DOT","MATIC"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 9 — Vermillion Capital
+  { name:"Vermillion Capital", username:"vermillion", country:"Other", badge:"gold",
+    bio:"VermillionCapital.com — Elite options desk. Highest total gain on platform. 7+ years verified.",
+    category:"options", trend_direction:"upward", gain:"127580.00", risk:"4",
+    avg_trade_time:"3 days", copiers:589, trades:1240, avg_profit_percent:"38.40",
+    avg_loss_percent:"5.20", total_wins:1024, total_losses:216, subscribers:812, followers:0,
+    current_positions:0, expert_rating:"4.97", return_ytd:"74.20", return_2y:"391.60",
+    avg_score_7d:"9.60", profitable_weeks:"78.00", min_account_threshold:"250000.00",
+    profit_share:20, max_drawdown:"5.20",
+    cumulative_earnings_copiers:"38400000.00", cumulative_copiers:644,
+    portfolio_breakdown:[{name:"Options",percentage:65},{name:"Crypto",percentage:22},{name:"Stocks",percentage:8},{name:"Cash",percentage:5}],
+    top_traded:[{ticker:"SPX",name:"S&P 500 Index",avg_profit:41.2,avg_loss:-5.4,profitable_pct:82},{ticker:"BTC",name:"Bitcoin",avg_profit:36.8,avg_loss:-6.1,profitable_pct:79},{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:44.3,avg_loss:-5.9,profitable_pct:80}],
+    frequently_traded:["SPX","QQQ","BTC","NVDA","AAPL","ETH","TSLA"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 10 — Orion Flux Capital
+  { name:"Orion Flux Capital", username:"orionflux", country:"United States", badge:"gold",
+    bio:"OrionFlux.com — SPX and NDX options specialist. Precision entries, asymmetric risk. 7 years live.",
+    category:"options", trend_direction:"upward", gain:"98340.00", risk:"4",
+    avg_trade_time:"3 days", copiers:471, trades:1087, avg_profit_percent:"36.20",
+    avg_loss_percent:"4.50", total_wins:978, total_losses:109, subscribers:664, followers:0,
+    current_positions:0, expert_rating:"4.92", return_ytd:"63.80", return_2y:"328.10",
+    avg_score_7d:"9.30", profitable_weeks:"75.00", min_account_threshold:"125000.00",
+    profit_share:20, max_drawdown:"6.10",
+    cumulative_earnings_copiers:"27600000.00", cumulative_copiers:524,
+    portfolio_breakdown:[{name:"Options",percentage:68},{name:"Stocks",percentage:20},{name:"Cash",percentage:12}],
+    top_traded:[{ticker:"SPX",name:"S&P 500 Index",avg_profit:38.4,avg_loss:-4.8,profitable_pct:81},{ticker:"QQQ",name:"Nasdaq ETF",avg_profit:29.7,avg_loss:-4.2,profitable_pct:79},{ticker:"AAPL",name:"Apple Inc",avg_profit:23.1,avg_loss:-3.9,profitable_pct:83}],
+    frequently_traded:["SPX","QQQ","AAPL","NVDA","MSFT","AMZN","TSLA"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 11 — Kestrel Trading Group
+  { name:"Kestrel Trading Group", username:"kestreltrading", country:"Canada", badge:"gold",
+    bio:"KestrelGroup.ca — Momentum swing trader. Earnings plays and breakout setups. Clean track record.",
+    category:"stocks", trend_direction:"upward", gain:"52780.00", risk:"3",
+    avg_trade_time:"1 week", copiers:319, trades:876, avg_profit_percent:"24.60",
+    avg_loss_percent:"3.40", total_wins:798, total_losses:78, subscribers:488, followers:0,
+    current_positions:0, expert_rating:"4.85", return_ytd:"58.20", return_2y:"271.30",
+    avg_score_7d:"9.10", profitable_weeks:"76.00", min_account_threshold:"110000.00",
+    profit_share:20, max_drawdown:"4.30",
+    cumulative_earnings_copiers:"19800000.00", cumulative_copiers:372,
+    portfolio_breakdown:[{name:"Stocks",percentage:50},{name:"Options",percentage:38},{name:"Cash",percentage:12}],
+    top_traded:[{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:27.4,avg_loss:-3.8,profitable_pct:82},{ticker:"META",name:"Meta Platforms",avg_profit:21.9,avg_loss:-3.2,profitable_pct:80},{ticker:"AMZN",name:"Amazon.com Inc",avg_profit:19.3,avg_loss:-3.6,profitable_pct:78}],
+    frequently_traded:["NVDA","META","AMZN","GOOG","MSFT","CRM","SHOP"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 12 — Solstice Markets
+  { name:"Solstice Markets", username:"solsticemkts", country:"Australia", badge:"gold",
+    bio:"SolsticeMarkets.com.au — Index futures and ETF options. Macro-driven. Consistent weekly returns.",
+    category:"futures", trend_direction:"upward", gain:"76450.00", risk:"4",
+    avg_trade_time:"3 days", copiers:396, trades:942, avg_profit_percent:"27.80",
+    avg_loss_percent:"4.10", total_wins:844, total_losses:98, subscribers:571, followers:0,
+    current_positions:0, expert_rating:"4.87", return_ytd:"55.40", return_2y:"295.60",
+    avg_score_7d:"9.00", profitable_weeks:"73.00", min_account_threshold:"180000.00",
+    profit_share:20, max_drawdown:"5.80",
+    cumulative_earnings_copiers:"23500000.00", cumulative_copiers:461,
+    portfolio_breakdown:[{name:"Futures",percentage:52},{name:"Options",percentage:32},{name:"Stocks",percentage:10},{name:"Cash",percentage:6}],
+    top_traded:[{ticker:"NQ",name:"E-mini Nasdaq",avg_profit:29.3,avg_loss:-4.6,profitable_pct:76},{ticker:"ES",name:"E-mini S&P 500",avg_profit:23.7,avg_loss:-4.0,profitable_pct:79},{ticker:"GC",name:"Gold Futures",avg_profit:18.2,avg_loss:-3.5,profitable_pct:72}],
+    frequently_traded:["NQ","ES","GC","CL","ZB","RTY","YM"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 13 — Pyxis Alpha Fund
+  { name:"Pyxis Alpha Fund", username:"pyxisalpha", country:"Germany", badge:"gold",
+    bio:"PyxisAlpha.de — European macro + US equities. Quant model, human oversight. 8 years verified.",
+    category:"stocks", trend_direction:"upward", gain:"115660.00", risk:"3",
+    avg_trade_time:"2 weeks", copiers:533, trades:1156, avg_profit_percent:"33.90",
+    avg_loss_percent:"3.60", total_wins:1048, total_losses:108, subscribers:742, followers:0,
+    current_positions:0, expert_rating:"4.95", return_ytd:"68.70", return_2y:"361.20",
+    avg_score_7d:"9.50", profitable_weeks:"80.00", min_account_threshold:"200000.00",
+    profit_share:20, max_drawdown:"4.20",
+    cumulative_earnings_copiers:"34100000.00", cumulative_copiers:601,
+    portfolio_breakdown:[{name:"Stocks",percentage:44},{name:"Options",percentage:40},{name:"Cash",percentage:16}],
+    top_traded:[{ticker:"AAPL",name:"Apple Inc",avg_profit:30.1,avg_loss:-3.7,profitable_pct:85},{ticker:"MSFT",name:"Microsoft Corp",avg_profit:26.4,avg_loss:-3.2,profitable_pct:83},{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:39.8,avg_loss:-4.4,profitable_pct:78}],
+    frequently_traded:["AAPL","MSFT","NVDA","AMZN","SAP","ASML","GOOG"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 14 — Halverson Signal
+  { name:"Halverson Signal", username:"halvorsonsig", country:"Norway", badge:"gold",
+    bio:"HalvorsonSignal.no — Systematic equity long/short. Risk-adjusted returns. Low drawdown focus.",
+    category:"stocks", trend_direction:"upward", gain:"41320.00", risk:"2",
+    avg_trade_time:"2 weeks", copiers:244, trades:728, avg_profit_percent:"22.10",
+    avg_loss_percent:"2.80", total_wins:672, total_losses:56, subscribers:358, followers:0,
+    current_positions:0, expert_rating:"4.79", return_ytd:"38.60", return_2y:"198.40",
+    avg_score_7d:"8.60", profitable_weeks:"78.00", min_account_threshold:"95000.00",
+    profit_share:20, max_drawdown:"3.10",
+    cumulative_earnings_copiers:"11400000.00", cumulative_copiers:281,
+    portfolio_breakdown:[{name:"Stocks",percentage:65},{name:"Options",percentage:25},{name:"Cash",percentage:10}],
+    top_traded:[{ticker:"MSFT",name:"Microsoft Corp",avg_profit:20.4,avg_loss:-2.9,profitable_pct:86},{ticker:"AAPL",name:"Apple Inc",avg_profit:18.7,avg_loss:-2.6,profitable_pct:87},{ticker:"GOOG",name:"Alphabet Inc",avg_profit:17.3,avg_loss:-3.1,profitable_pct:84}],
+    frequently_traded:["MSFT","AAPL","GOOG","AMZN","NVDA","V","JPM"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 15 — Cascadia Prime
+  { name:"Cascadia Prime", username:"cascadiaprime", country:"United States", badge:"gold",
+    bio:"CascadiaPrime.com — Pacific Northwest based. SPX options and crypto. Aggressive growth model.",
+    category:"options", trend_direction:"upward", gain:"67920.00", risk:"6",
+    avg_trade_time:"1 day", copiers:307, trades:1310, avg_profit_percent:"41.30",
+    avg_loss_percent:"7.20", total_wins:1091, total_losses:219, subscribers:445, followers:0,
+    current_positions:0, expert_rating:"4.74", return_ytd:"49.50", return_2y:"244.80",
+    avg_score_7d:"8.80", profitable_weeks:"69.00", min_account_threshold:"85000.00",
+    profit_share:20, max_drawdown:"9.40",
+    cumulative_earnings_copiers:"17300000.00", cumulative_copiers:349,
+    portfolio_breakdown:[{name:"Options",percentage:72},{name:"Crypto",percentage:20},{name:"Cash",percentage:8}],
+    top_traded:[{ticker:"SPX",name:"S&P 500 Index",avg_profit:44.2,avg_loss:-7.8,profitable_pct:74},{ticker:"BTC",name:"Bitcoin",avg_profit:38.7,avg_loss:-8.1,profitable_pct:70},{ticker:"QQQ",name:"Nasdaq ETF",avg_profit:36.1,avg_loss:-6.9,profitable_pct:72}],
+    frequently_traded:["SPX","BTC","QQQ","ETH","TSLA","NVDA","SOL"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 16 — Thornwick Asset Management
+  { name:"Thornwick Asset Management", username:"thornwickam", country:"United Kingdom", badge:"gold",
+    bio:"ThornwickAM.co.uk — Institutional-grade copy trading. FTSE + US equities. Capital preservation first.",
+    category:"stocks", trend_direction:"upward", gain:"88140.00", risk:"3",
+    avg_trade_time:"2 weeks", copiers:476, trades:994, avg_profit_percent:"31.60",
+    avg_loss_percent:"3.30", total_wins:912, total_losses:82, subscribers:658, followers:0,
+    current_positions:0, expert_rating:"4.93", return_ytd:"64.10", return_2y:"307.90",
+    avg_score_7d:"9.20", profitable_weeks:"82.00", min_account_threshold:"300000.00",
+    profit_share:20, max_drawdown:"4.00",
+    cumulative_earnings_copiers:"29800000.00", cumulative_copiers:528,
+    portfolio_breakdown:[{name:"Stocks",percentage:55},{name:"Options",percentage:32},{name:"Cash",percentage:13}],
+    top_traded:[{ticker:"AAPL",name:"Apple Inc",avg_profit:28.9,avg_loss:-3.4,profitable_pct:85},{ticker:"AMZN",name:"Amazon.com Inc",avg_profit:24.6,avg_loss:-3.1,profitable_pct:83},{ticker:"MSFT",name:"Microsoft Corp",avg_profit:22.3,avg_loss:-2.9,profitable_pct:86}],
+    frequently_traded:["AAPL","AMZN","MSFT","GOOG","V","BRK.B","JNJ"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 17 — Vega Storm Capital
+  { name:"Vega Storm Capital", username:"vegastorm", country:"Other", badge:"gold",
+    bio:"VegaStorm.ae — High-conviction options flow trader. Earnings + macro catalysts. Dubai based.",
+    category:"options", trend_direction:"upward", gain:"103850.00", risk:"5",
+    avg_trade_time:"3 days", copiers:524, trades:1098, avg_profit_percent:"37.40",
+    avg_loss_percent:"5.80", total_wins:967, total_losses:131, subscribers:718, followers:0,
+    current_positions:0, expert_rating:"4.90", return_ytd:"70.30", return_2y:"339.70",
+    avg_score_7d:"9.40", profitable_weeks:"76.00", min_account_threshold:"150000.00",
+    profit_share:20, max_drawdown:"7.10",
+    cumulative_earnings_copiers:"32600000.00", cumulative_copiers:579,
+    portfolio_breakdown:[{name:"Options",percentage:66},{name:"Crypto",percentage:22},{name:"Stocks",percentage:8},{name:"Cash",percentage:4}],
+    top_traded:[{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:42.6,avg_loss:-6.2,profitable_pct:80},{ticker:"TSLA",name:"Tesla Inc",avg_profit:39.1,avg_loss:-6.7,profitable_pct:75},{ticker:"BTC",name:"Bitcoin",avg_profit:35.8,avg_loss:-5.9,profitable_pct:78}],
+    frequently_traded:["NVDA","TSLA","BTC","SPX","ETH","AMZN","META"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 18 — Auric Systems
+  { name:"Auric Systems", username:"auricsys", country:"Japan", badge:"gold",
+    bio:"AuricSystems.jp — Nikkei and US tech hybrid. Quant signals, 5-year live record. Asia and US sessions.",
+    category:"stocks", trend_direction:"upward", gain:"59270.00", risk:"4",
+    avg_trade_time:"1 week", copiers:341, trades:903, avg_profit_percent:"26.80",
+    avg_loss_percent:"4.60", total_wins:807, total_losses:96, subscribers:499, followers:0,
+    current_positions:0, expert_rating:"4.82", return_ytd:"51.90", return_2y:"258.40",
+    avg_score_7d:"8.90", profitable_weeks:"71.00", min_account_threshold:"130000.00",
+    profit_share:20, max_drawdown:"6.80",
+    cumulative_earnings_copiers:"16900000.00", cumulative_copiers:393,
+    portfolio_breakdown:[{name:"Stocks",percentage:48},{name:"Options",percentage:36},{name:"Futures",percentage:10},{name:"Cash",percentage:6}],
+    top_traded:[{ticker:"7203.T",name:"Toyota Motor",avg_profit:24.3,avg_loss:-4.9,profitable_pct:74},{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:31.7,avg_loss:-5.1,profitable_pct:77},{ticker:"SONY",name:"Sony Group",avg_profit:20.6,avg_loss:-4.2,profitable_pct:76}],
+    frequently_traded:["NVDA","SONY","7203.T","AAPL","MSFT","TSM","ASML"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+
+  // 19 — Polaris Quant
+  { name:"Polaris Quant", username:"polarisquant", country:"United States", badge:"gold",
+    bio:"PolarisQuant.io — Pure systematic. No discretion, no emotion. 9-year backtest, 6-year live. Top 1% platform.",
+    category:"options", trend_direction:"upward", gain:"121390.00", risk:"4",
+    avg_trade_time:"3 days", copiers:561, trades:1194, avg_profit_percent:"36.70",
+    avg_loss_percent:"4.80", total_wins:1071, total_losses:123, subscribers:784, followers:0,
+    current_positions:0, expert_rating:"4.96", return_ytd:"71.80", return_2y:"374.50",
+    avg_score_7d:"9.50", profitable_weeks:"79.00", min_account_threshold:"220000.00",
+    profit_share:20, max_drawdown:"5.60",
+    cumulative_earnings_copiers:"36200000.00", cumulative_copiers:618,
+    portfolio_breakdown:[{name:"Options",percentage:63},{name:"Stocks",percentage:22},{name:"Crypto",percentage:10},{name:"Cash",percentage:5}],
+    top_traded:[{ticker:"SPX",name:"S&P 500 Index",avg_profit:39.4,avg_loss:-5.1,profitable_pct:82},{ticker:"NVDA",name:"NVIDIA Corp",avg_profit:43.8,avg_loss:-5.4,profitable_pct:80},{ticker:"QQQ",name:"Nasdaq ETF",avg_profit:31.2,avg_loss:-4.7,profitable_pct:81}],
+    frequently_traded:["SPX","NVDA","QQQ","AAPL","MSFT","BTC","AMZN"],
+    tags:[], performance_data:[], monthly_performance:[], is_active:true },
+];
+
+function reInitJsonBuilder(fieldId, initFn, jsonValue) {
+    const textarea = document.getElementById(fieldId);
+    if (!textarea) return;
+    const prev = textarea.previousElementSibling;
+    if (prev) prev.remove();
+    textarea.style.display = '';
+    textarea.value = (jsonValue && jsonValue.length) ? JSON.stringify(jsonValue) : '';
+    initFn(fieldId);
+}
+
+function loadPreset() {
+    const idx = document.getElementById('presetSelect').value;
+    if (idx === '') { alert('Please select a preset trader first.'); return; }
+    const t = TRADER_PRESETS[parseInt(idx, 10)];
+
+    document.getElementById('id_name').value              = t.name;
+    document.getElementById('id_username').value          = t.username;
+    document.getElementById('id_country').value           = t.country;
+    document.getElementById('id_badge').value             = t.badge;
+    document.getElementById('id_bio').value               = t.bio;
+    document.getElementById('id_category').value          = t.category;
+    document.getElementById('id_trend_direction').value   = t.trend_direction;
+    document.getElementById('id_gain').value              = t.gain;
+    document.getElementById('id_risk').value              = t.risk;
+    document.getElementById('id_avg_trade_time').value    = t.avg_trade_time;
+    document.getElementById('id_copiers').value           = t.copiers;
+    document.getElementById('id_trades').value            = t.trades;
+    document.getElementById('id_avg_profit_percent').value = t.avg_profit_percent;
+    document.getElementById('id_avg_loss_percent').value  = t.avg_loss_percent;
+    document.getElementById('id_total_wins').value        = t.total_wins;
+    document.getElementById('id_total_losses').value      = t.total_losses;
+    document.getElementById('id_subscribers').value       = t.subscribers;
+    document.getElementById('id_followers').value         = t.followers;
+    document.getElementById('id_current_positions').value = t.current_positions;
+    document.getElementById('id_expert_rating').value     = t.expert_rating;
+    document.getElementById('id_return_ytd').value        = t.return_ytd;
+    document.getElementById('id_return_2y').value         = t.return_2y;
+    document.getElementById('id_avg_score_7d').value      = t.avg_score_7d;
+    document.getElementById('id_profitable_weeks').value  = t.profitable_weeks;
+    document.getElementById('id_min_account_threshold').value = t.min_account_threshold;
+    document.getElementById('id_profit_share').value      = t.profit_share;
+    document.getElementById('id_max_drawdown').value      = t.max_drawdown;
+    document.getElementById('id_cumulative_earnings_copiers').value = t.cumulative_earnings_copiers;
+    document.getElementById('id_cumulative_copiers').value = t.cumulative_copiers;
+    document.getElementById('id_is_active').checked       = t.is_active;
+
+    reInitJsonBuilder('id_tags',                initTagsBuilder,           t.tags);
+    reInitJsonBuilder('id_portfolio_breakdown', initPortfolioBuilder,      t.portfolio_breakdown);
+    reInitJsonBuilder('id_top_traded',          initTopTradedBuilder,      t.top_traded);
+    reInitJsonBuilder('id_performance_data',    function(id){ initPerformanceBuilder(id, false); }, t.performance_data);
+    reInitJsonBuilder('id_monthly_performance', function(id){ initPerformanceBuilder(id, true);  }, t.monthly_performance);
+    reInitJsonBuilder('id_frequently_traded',   initFrequentlyTradedBuilder, t.frequently_traded);
+
+    document.querySelector('form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+{% endblock %}

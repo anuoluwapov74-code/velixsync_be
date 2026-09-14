@@ -1,0 +1,518 @@
+<!-- JSON Builder Scripts for Trader Forms -->
+<script>
+// ============================================================================
+// TAGS BUILDER
+// ============================================================================
+function initTagsBuilder(inputId) {
+    const textarea = document.getElementById(inputId);
+    const container = document.createElement('div');
+    container.className = 'mb-2';
+
+    const tagsContainer = document.createElement('div');
+    tagsContainer.className = 'flex flex-wrap gap-2 mb-2';
+
+    const inputWrapper = document.createElement('div');
+    inputWrapper.className = 'flex gap-2';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Enter a tag...';
+    input.className = 'flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm';
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.textContent = 'Add Tag';
+    addBtn.className = 'px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-500';
+
+    let tags = [];
+
+    // Load existing tags
+    try {
+        const existing = textarea.value.trim();
+        if (existing) tags = JSON.parse(existing);
+    } catch (e) {}
+
+    function renderTags() {
+        tagsContainer.innerHTML = '';
+        tags.forEach((tag, idx) => {
+            const chip = document.createElement('div');
+            chip.className = 'flex items-center gap-2 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm';
+            chip.innerHTML = `
+                <span>${tag}</span>
+                <button type="button" class="text-indigo-500 hover:text-indigo-700" onclick="this.closest('.flex').remove(); updateTags${inputId}()">×</button>
+            `;
+            tagsContainer.appendChild(chip);
+        });
+        textarea.value = tags.length ? JSON.stringify(tags) : '';
+    }
+
+    window['updateTags' + inputId] = function() {
+        tags = Array.from(tagsContainer.children).map(chip => chip.querySelector('span').textContent);
+        textarea.value = tags.length ? JSON.stringify(tags) : '';
+    };
+
+    addBtn.addEventListener('click', () => {
+        const val = input.value.trim();
+        if (val) {
+            tags.push(val);
+            input.value = '';
+            renderTags();
+        }
+    });
+
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addBtn.click();
+        }
+    });
+
+    inputWrapper.appendChild(input);
+    inputWrapper.appendChild(addBtn);
+    container.appendChild(tagsContainer);
+    container.appendChild(inputWrapper);
+
+    textarea.style.display = 'none';
+    textarea.parentNode.insertBefore(container, textarea);
+
+    renderTags();
+}
+
+// ============================================================================
+// PORTFOLIO BREAKDOWN BUILDER
+// ============================================================================
+function initPortfolioBuilder(textareaId) {
+    const textarea = document.getElementById(textareaId);
+    const container = document.createElement('div');
+
+    const itemsContainer = document.createElement('div');
+    itemsContainer.className = 'space-y-2 mb-3';
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.textContent = '+ Add Portfolio Item';
+    addBtn.className = 'px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-500';
+
+    let items = [];
+
+    // Common portfolio categories
+    const categories = [
+        'ETF', 'Stocks', 'Crypto', 'Forex', 'Commodities', 'Futures',
+        'Options', 'Bonds', 'Real Estate', 'Cash', 'Other'
+    ];
+
+    // Load existing data
+    try {
+        const existing = textarea.value.trim();
+        if (existing) items = JSON.parse(existing);
+    } catch (e) {}
+
+    function renderItems() {
+        itemsContainer.innerHTML = '';
+        items.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'flex flex-wrap gap-2 items-center';
+
+            // Build category dropdown
+            let categoryOptions = '<option value="">Select or type custom...</option>';
+            categories.forEach(cat => {
+                const selected = item.name === cat ? 'selected' : '';
+                categoryOptions += `<option value="${cat}" ${selected}>${cat}</option>`;
+            });
+
+            row.innerHTML = `
+                <select class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm" onchange="updatePortfolioFromDropdown${textareaId}(${idx}, this.value)">
+                    ${categoryOptions}
+                </select>
+                <input type="text" value="${item.name || ''}" placeholder="Or type custom" class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm" onchange="updatePortfolio${textareaId}(${idx}, 'name', this.value)">
+                <input type="number" value="${item.percentage || ''}" placeholder="e.g., 25" class="w-24 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm" onchange="updatePortfolio${textareaId}(${idx}, 'percentage', parseFloat(this.value) || 0)">
+                <span class="text-sm text-gray-500">%</span>
+                <button type="button" class="px-3 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600" onclick="removePortfolio${textareaId}(${idx})">×</button>
+            `;
+            itemsContainer.appendChild(row);
+        });
+        textarea.value = items.length ? JSON.stringify(items) : '';
+    }
+
+    window['updatePortfolioFromDropdown' + textareaId] = function(idx, value) {
+        if (value) {
+            items[idx].name = value;
+            textarea.value = JSON.stringify(items);
+            renderItems();
+        }
+    };
+
+    window['updatePortfolio' + textareaId] = function(idx, key, val) {
+        items[idx][key] = val;
+        textarea.value = JSON.stringify(items);
+    };
+
+    window['removePortfolio' + textareaId] = function(idx) {
+        items.splice(idx, 1);
+        renderItems();
+    };
+
+    addBtn.addEventListener('click', () => {
+        items.push({ name: '', percentage: 0 });
+        renderItems();
+    });
+
+    container.appendChild(itemsContainer);
+    container.appendChild(addBtn);
+
+    textarea.style.display = 'none';
+    textarea.parentNode.insertBefore(container, textarea);
+
+    renderItems();
+}
+
+// ============================================================================
+// TOP TRADED ASSETS BUILDER
+// ============================================================================
+function initTopTradedBuilder(textareaId) {
+    const textarea = document.getElementById(textareaId);
+    const container = document.createElement('div');
+
+    const itemsContainer = document.createElement('div');
+    itemsContainer.className = 'space-y-3 mb-3';
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.textContent = '+ Add Asset';
+    addBtn.className = 'px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-500';
+
+    let items = [];
+
+    // Popular assets list
+    const popularAssets = {
+        // Stocks
+        'AAPL': 'Apple Inc',
+        'MSFT': 'Microsoft Corp',
+        'GOOGL': 'Alphabet Inc',
+        'AMZN': 'Amazon.com Inc',
+        'TSLA': 'Tesla Inc',
+        'META': 'Meta Platforms',
+        'NVDA': 'NVIDIA Corp',
+        'JPM': 'JPMorgan Chase',
+        'V': 'Visa Inc',
+        'WMT': 'Walmart Inc',
+        // Crypto
+        'BTC': 'Bitcoin',
+        'ETH': 'Ethereum',
+        'BNB': 'Binance Coin',
+        'SOL': 'Solana',
+        'XRP': 'Ripple',
+        'ADA': 'Cardano',
+        'DOGE': 'Dogecoin',
+        'MATIC': 'Polygon',
+        // Forex
+        'EUR/USD': 'Euro/US Dollar',
+        'GBP/USD': 'British Pound/US Dollar',
+        'USD/JPY': 'US Dollar/Japanese Yen',
+        'USD/CHF': 'US Dollar/Swiss Franc',
+        'AUD/USD': 'Australian Dollar/US Dollar',
+        // Commodities
+        'GOLD': 'Gold',
+        'SILVER': 'Silver',
+        'OIL': 'Crude Oil',
+        'GAS': 'Natural Gas'
+    };
+
+    try {
+        const existing = textarea.value.trim();
+        if (existing) items = JSON.parse(existing);
+    } catch (e) {}
+
+    function renderItems() {
+        itemsContainer.innerHTML = '';
+        items.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'p-3 bg-gray-50 rounded-lg border border-gray-200';
+
+            // Build asset dropdown options
+            let assetOptions = '<option value="">Select Asset or Type Custom</option>';
+            for (const [ticker, name] of Object.entries(popularAssets)) {
+                const selected = item.ticker === ticker ? 'selected' : '';
+                assetOptions += `<option value="${ticker}" ${selected}>${ticker} - ${name}</option>`;
+            }
+
+            row.innerHTML = `
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div>
+                        <select class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" onchange="updateAssetFromDropdown${textareaId}(${idx}, this.value)">
+                            ${assetOptions}
+                        </select>
+                    </div>
+                    <input type="text" value="${item.ticker || ''}" placeholder="Or enter ticker" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" onchange="updateTopTraded${textareaId}(${idx}, 'ticker', this.value)">
+                </div>
+                <div class="mb-2">
+                    <input type="text" value="${item.name || ''}" placeholder="Asset Name" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" onchange="updateTopTraded${textareaId}(${idx}, 'name', this.value)">
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="number" step="0.1" value="${item.avg_profit || ''}" placeholder="e.g., 12.5" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" onchange="updateTopTraded${textareaId}(${idx}, 'avg_profit', parseFloat(this.value) || 0)">
+                    <input type="number" step="0.1" value="${item.avg_loss || ''}" placeholder="e.g., -3.2" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" onchange="updateTopTraded${textareaId}(${idx}, 'avg_loss', parseFloat(this.value) || 0)">
+                    <input type="number" value="${item.profitable_pct || ''}" placeholder="e.g., 78" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm" onchange="updateTopTraded${textareaId}(${idx}, 'profitable_pct', parseInt(this.value) || 0)">
+                </div>
+                <div class="grid grid-cols-3 gap-2 mt-1 text-xs text-gray-500">
+                    <span class="text-center">Avg Profit %</span>
+                    <span class="text-center">Avg Loss %</span>
+                    <span class="text-center">Profitable %</span>
+                </div>
+                <button type="button" class="mt-2 px-3 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600" onclick="removeTopTraded${textareaId}(${idx})">Remove</button>
+            `;
+            itemsContainer.appendChild(row);
+        });
+        textarea.value = items.length ? JSON.stringify(items) : '';
+    }
+
+    window['updateAssetFromDropdown' + textareaId] = function(idx, ticker) {
+        if (ticker && popularAssets[ticker]) {
+            items[idx].ticker = ticker;
+            items[idx].name = popularAssets[ticker];
+            textarea.value = JSON.stringify(items);
+            renderItems();
+        }
+    };
+
+    window['updateTopTraded' + textareaId] = function(idx, key, val) {
+        items[idx][key] = val;
+        textarea.value = JSON.stringify(items);
+    };
+
+    window['removeTopTraded' + textareaId] = function(idx) {
+        items.splice(idx, 1);
+        renderItems();
+    };
+
+    addBtn.addEventListener('click', () => {
+        items.push({ name: '', ticker: '', avg_profit: 0, avg_loss: 0, profitable_pct: 0 });
+        renderItems();
+    });
+
+    container.appendChild(itemsContainer);
+    container.appendChild(addBtn);
+
+    textarea.style.display = 'none';
+    textarea.parentNode.insertBefore(container, textarea);
+
+    renderItems();
+}
+
+// ============================================================================
+// PERFORMANCE DATA BUILDER (Monthly)
+// ============================================================================
+function initPerformanceBuilder(textareaId, isPercentage = false) {
+    const textarea = document.getElementById(textareaId);
+    const container = document.createElement('div');
+
+    const itemsContainer = document.createElement('div');
+    itemsContainer.className = 'space-y-2 mb-3';
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.textContent = '+ Add Month';
+    addBtn.className = 'px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-500';
+
+    let items = [];
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    try {
+        const existing = textarea.value.trim();
+        if (existing) items = JSON.parse(existing);
+    } catch (e) {}
+
+    function renderItems() {
+        itemsContainer.innerHTML = '';
+        items.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'flex flex-wrap gap-2 items-center';
+            const valueKey = isPercentage ? 'percentage' : 'value';
+
+            // Build month dropdown
+            let monthOptions = '<option value="">Select month...</option>';
+            months.forEach(month => {
+                const selected = item.month === month ? 'selected' : '';
+                monthOptions += `<option value="${month}" ${selected}>${month}</option>`;
+            });
+
+            const placeholder = isPercentage ? 'e.g., 12.5' : 'e.g., 1500';
+            const valuePlaceholder = isPercentage ? `${placeholder} %` : placeholder;
+
+            row.innerHTML = `
+                <select class="w-28 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm" onchange="updatePerf${textareaId}(${idx}, 'month', this.value)">
+                    ${monthOptions}
+                </select>
+                <input type="number" step="0.01" value="${item[valueKey] || ''}" placeholder="${placeholder}" class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm" onchange="updatePerf${textareaId}(${idx}, '${valueKey}', parseFloat(this.value) || 0)">
+                ${isPercentage ? '<span class="text-sm text-gray-500">%</span>' : ''}
+                <button type="button" class="px-3 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600" onclick="removePerf${textareaId}(${idx})">×</button>
+            `;
+            itemsContainer.appendChild(row);
+        });
+        textarea.value = items.length ? JSON.stringify(items) : '';
+    }
+
+    window['updatePerf' + textareaId] = function(idx, key, val) {
+        items[idx][key] = val;
+        textarea.value = JSON.stringify(items);
+    };
+
+    window['removePerf' + textareaId] = function(idx) {
+        items.splice(idx, 1);
+        renderItems();
+    };
+
+    addBtn.addEventListener('click', () => {
+        const newItem = { month: '' };
+        newItem[isPercentage ? 'percentage' : 'value'] = 0;
+        items.push(newItem);
+        renderItems();
+    });
+
+    container.appendChild(itemsContainer);
+    container.appendChild(addBtn);
+
+    textarea.style.display = 'none';
+    textarea.parentNode.insertBefore(container, textarea);
+
+    renderItems();
+}
+
+// ============================================================================
+// FREQUENTLY TRADED BUILDER (Simple list)
+// ============================================================================
+function initFrequentlyTradedBuilder(textareaId) {
+    const textarea = document.getElementById(textareaId);
+    const container = document.createElement('div');
+
+    const itemsContainer = document.createElement('div');
+    itemsContainer.className = 'flex flex-wrap gap-2 mb-3';
+
+    const inputWrapper = document.createElement('div');
+    inputWrapper.className = 'flex gap-2';
+
+    // Asset dropdown
+    const select = document.createElement('select');
+    select.className = 'flex-1 min-w-[160px] px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm';
+
+    const popularAssets = {
+        // Stocks
+        'AAPL': 'Apple Inc', 'MSFT': 'Microsoft', 'GOOGL': 'Alphabet', 'AMZN': 'Amazon',
+        'TSLA': 'Tesla', 'META': 'Meta', 'NVDA': 'NVIDIA', 'JPM': 'JPMorgan',
+        'V': 'Visa', 'WMT': 'Walmart', 'DIS': 'Disney', 'NFLX': 'Netflix',
+        // Crypto
+        'BTC': 'Bitcoin', 'ETH': 'Ethereum', 'BNB': 'Binance Coin', 'SOL': 'Solana',
+        'XRP': 'Ripple', 'ADA': 'Cardano', 'DOGE': 'Dogecoin', 'MATIC': 'Polygon',
+        'DOT': 'Polkadot', 'AVAX': 'Avalanche',
+        // Forex
+        'EUR/USD': 'Euro/Dollar', 'GBP/USD': 'Pound/Dollar', 'USD/JPY': 'Dollar/Yen',
+        'USD/CHF': 'Dollar/Franc', 'AUD/USD': 'Aussie/Dollar', 'USD/CAD': 'Dollar/Loonie',
+        // Commodities
+        'GOLD': 'Gold', 'SILVER': 'Silver', 'OIL': 'Crude Oil', 'GAS': 'Natural Gas',
+        'COPPER': 'Copper', 'WHEAT': 'Wheat'
+    };
+
+    select.innerHTML = '<option value="">Select an asset...</option>';
+    for (const [ticker, name] of Object.entries(popularAssets)) {
+        select.innerHTML += `<option value="${ticker}">${ticker} - ${name}</option>`;
+    }
+
+    // Custom input option
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Or type custom ticker...';
+    input.className = 'flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm';
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.textContent = 'Add';
+    addBtn.className = 'px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-500';
+
+    let assets = [];
+
+    try {
+        const existing = textarea.value.trim();
+        if (existing) assets = JSON.parse(existing);
+    } catch (e) {}
+
+    function renderAssets() {
+        itemsContainer.innerHTML = '';
+        assets.forEach((asset, idx) => {
+            const chip = document.createElement('div');
+            chip.className = 'flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium';
+            chip.innerHTML = `
+                <span>${asset}</span>
+                <button type="button" class="text-blue-500 hover:text-blue-700 font-bold" onclick="removeFreq${textareaId}(${idx})">×</button>
+            `;
+            itemsContainer.appendChild(chip);
+        });
+        textarea.value = assets.length ? JSON.stringify(assets) : '';
+    }
+
+    window['removeFreq' + textareaId] = function(idx) {
+        assets.splice(idx, 1);
+        renderAssets();
+    };
+
+    addBtn.addEventListener('click', () => {
+        let val = select.value || input.value.trim();
+        if (val && !assets.includes(val)) {
+            assets.push(val);
+            select.value = '';
+            input.value = '';
+            renderAssets();
+        }
+    });
+
+    select.addEventListener('change', () => {
+        if (select.value) input.value = '';
+    });
+
+    input.addEventListener('input', () => {
+        if (input.value) select.value = '';
+    });
+
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addBtn.click();
+        }
+    });
+
+    inputWrapper.className = 'flex flex-wrap gap-2';
+    inputWrapper.appendChild(select);
+    inputWrapper.appendChild(input);
+    inputWrapper.appendChild(addBtn);
+    container.appendChild(itemsContainer);
+    container.appendChild(inputWrapper);
+
+    textarea.style.display = 'none';
+    textarea.parentNode.insertBefore(container, textarea);
+
+    renderAssets();
+}
+
+// ============================================================================
+// INITIALIZE ALL BUILDERS
+// ============================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all builders if elements exist
+    const tagsField = document.getElementById('id_tags');
+    if (tagsField) initTagsBuilder('id_tags');
+
+    const portfolioField = document.getElementById('id_portfolio_breakdown');
+    if (portfolioField) initPortfolioBuilder('id_portfolio_breakdown');
+
+    const topTradedField = document.getElementById('id_top_traded');
+    if (topTradedField) initTopTradedBuilder('id_top_traded');
+
+    const perfDataField = document.getElementById('id_performance_data');
+    if (perfDataField) initPerformanceBuilder('id_performance_data', false);
+
+    const monthlyPerfField = document.getElementById('id_monthly_performance');
+    if (monthlyPerfField) initPerformanceBuilder('id_monthly_performance', true);
+
+    const freqTradedField = document.getElementById('id_frequently_traded');
+    if (freqTradedField) initFrequentlyTradedBuilder('id_frequently_traded');
+});
+</script>

@@ -1,0 +1,118 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Bulk Add Trade - VelixSync Admin{% endblock %}
+{% block page_title %}Bulk Add Trade{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+
+    <!-- Selected users banner -->
+    <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6">
+        <h3 class="text-sm font-semibold text-indigo-800 mb-3">
+            <i class="fas fa-users mr-1"></i>
+            Adding trade for {{ selected_users|length }} user{{ selected_users|length|pluralize }}:
+        </h3>
+        <div class="flex flex-wrap gap-2">
+            {% for u in selected_users %}
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
+                <span class="w-5 h-5 bg-indigo-200 rounded-full flex items-center justify-center text-[10px] font-bold">{{ u.email|first|upper }}</span>
+                {{ u.email }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if form.errors %}
+    <div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-red-800 mb-2">Please correct the following errors:</h4>
+        <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+            {% for field in form %}{% for error in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}{% endfor %}
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-xl border border-gray-200/60 p-4 sm:p-6">
+        <form method="post" enctype="multipart/form-data" action="{% url 'dashboard:bulk_add_user_trade' %}">
+            {% csrf_token %}
+            <input type="hidden" name="stage" value="add_trade">
+            {% for uid in user_ids %}
+            <input type="hidden" name="user_ids" value="{{ uid }}">
+            {% endfor %}
+
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-bar text-indigo-500"></i> Trade Details
+            </h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.market.label }}</label>
+                    {{ form.market }}
+                    {% if form.market.errors %}<p class="text-xs text-red-600 mt-1">{{ form.market.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.direction.label }}</label>
+                    {{ form.direction }}
+                    {% if form.direction.errors %}<p class="text-xs text-red-600 mt-1">{{ form.direction.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.duration.label }}</label>
+                    {{ form.duration }}
+                    {% if form.duration.errors %}<p class="text-xs text-red-600 mt-1">{{ form.duration.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.status.label }}</label>
+                    {{ form.status }}
+                    {% if form.status.errors %}<p class="text-xs text-red-600 mt-1">{{ form.status.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-dollar-sign text-emerald-500"></i> Financial Details
+            </h4>
+
+            <!-- Trade amount and investment amount are auto-set per user's main balance -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.entry_price.label }}</label>
+                    {{ form.entry_price }}
+                    {% if form.entry_price.errors %}<p class="text-xs text-red-600 mt-1">{{ form.entry_price.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.exit_price.label }}</label>
+                    {{ form.exit_price }}
+                    {% if form.exit_price.errors %}<p class="text-xs text-red-600 mt-1">{{ form.exit_price.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.profit_loss_percent.label }}</label>
+                    {{ form.profit_loss_percent }}
+                    <p class="text-xs text-gray-400 mt-1">{{ form.profit_loss_percent.help_text }}</p>
+                    {% if form.profit_loss_percent.errors %}<p class="text-xs text-red-600 mt-1">{{ form.profit_loss_percent.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.closed_at.label }}</label>
+                    {{ form.closed_at }}
+                    {% if form.closed_at.errors %}<p class="text-xs text-red-600 mt-1">{{ form.closed_at.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.notes.label }}</label>
+                    {{ form.notes }}
+                    {% if form.notes.errors %}<p class="text-xs text-red-600 mt-1">{{ form.notes.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button type="submit"
+                    class="w-full sm:w-auto px-8 py-3 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500 transition">
+                    <i class="fas fa-plus mr-1"></i>
+                    Add Trade for {{ selected_users|length }} User{{ selected_users|length|pluralize }}
+                </button>
+                <a href="{% url 'dashboard:users_trade_list' %}"
+                    class="w-full sm:w-auto px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition text-center">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+﻿{% extends "dashboard/base.html" %}
+{% load humanize %}
+{% block title %}Dashboard - VelixSync Admin{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-5 hover:shadow-md transition">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center"><i class="fas fa-users text-blue-500"></i></div>
+            <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">Active</span>
+        </div>
+        <p class="text-2xl font-bold text-gray-800">{{ total_users }}</p>
+        <p class="text-xs text-gray-500 mt-1">Total Users</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200/60 p-5 hover:shadow-md transition">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center"><i class="fas fa-user-check text-emerald-500"></i></div>
+            <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Verified</span>
+        </div>
+        <p class="text-2xl font-bold text-gray-800">{{ verified_users }}</p>
+        <p class="text-xs text-gray-500 mt-1">Verified Users</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200/60 p-5 hover:shadow-md transition">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center"><i class="fas fa-id-card text-amber-500"></i></div>
+            {% if pending_kyc > 0 %}<span class="text-xs font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Action</span>{% endif %}
+        </div>
+        <p class="text-2xl font-bold text-gray-800">{{ pending_kyc }}</p>
+        <p class="text-xs text-gray-500 mt-1">Pending KYC</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200/60 p-5 hover:shadow-md transition">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center"><i class="fas fa-coins text-purple-500"></i></div>
+        </div>
+        <p class="text-2xl font-bold text-gray-800">${{ total_deposits|floatformat:2|intcomma }}</p>
+        <p class="text-xs text-gray-500 mt-1">Total Deposits</p>
+    </div>
+</div>
+
+<!-- Pending Actions Row -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <a href="{% url 'dashboard:deposits' %}" class="bg-white rounded-xl border border-gray-200/60 p-5 hover:shadow-md hover:border-indigo-200 transition group">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition">
+                <i class="fas fa-arrow-down text-orange-500 text-lg"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-gray-800">{{ pending_deposits }}</p>
+                <p class="text-sm text-gray-500">Pending Deposits</p>
+            </div>
+        </div>
+    </a>
+    <a href="{% url 'dashboard:withdrawals' %}" class="bg-white rounded-xl border border-gray-200/60 p-5 hover:shadow-md hover:border-indigo-200 transition group">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center group-hover:bg-red-100 transition">
+                <i class="fas fa-arrow-up text-red-500 text-lg"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-gray-800">{{ pending_withdrawals }}</p>
+                <p class="text-sm text-gray-500">Pending Withdrawals</p>
+            </div>
+        </div>
+    </a>
+    <div class="bg-white rounded-xl border border-gray-200/60 p-5">
+        <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center">
+                <i class="fas fa-arrow-up text-rose-500 text-lg"></i>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-gray-800">${{ total_withdrawals|floatformat:2|intcomma }}</p>
+                <p class="text-sm text-gray-500">Total Withdrawals</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Recent Transactions -->
+    <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-700">Recent Transactions</h3>
+            <a href="{% url 'dashboard:transactions' %}" class="text-xs text-indigo-600 hover:underline">View All</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[500px]">
+                <thead><tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                    <th class="px-5 py-3">User</th><th class="px-5 py-3">Type</th><th class="px-5 py-3">Amount</th><th class="px-5 py-3">Status</th>
+                </tr></thead>
+                <tbody class="divide-y divide-gray-100">
+                {% for tx in recent_transactions %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-5 py-3 truncate max-w-[180px]">{{ tx.user.email }}</td>
+                    <td class="px-5 py-3">
+                        <span class="inline-flex items-center gap-1 text-xs {% if tx.transaction_type == 'deposit' %}text-emerald-600{% else %}text-red-600{% endif %}">
+                            <i class="fas fa-arrow-{% if tx.transaction_type == 'deposit' %}down{% else %}up{% endif %} text-[10px]"></i>
+                            {{ tx.transaction_type|title }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-3 font-medium">${{ tx.amount|floatformat:2|intcomma }}</td>
+                    <td class="px-5 py-3">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium {% if tx.status == 'completed' %}bg-emerald-50 text-emerald-700{% elif tx.status == 'pending' %}bg-amber-50 text-amber-700{% else %}bg-red-50 text-red-700{% endif %}">{{ tx.status|title }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="px-5 py-8 text-center text-gray-400">No transactions yet</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-700">Recent Users</h3>
+            <a href="{% url 'dashboard:users_list' %}" class="text-xs text-indigo-600 hover:underline">View All</a>
+        </div>
+        <div class="divide-y divide-gray-100">
+            {% for u in recent_users %}
+            <a href="{% url 'dashboard:user_detail' u.id %}" class="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition">
+                <div class="w-9 h-9 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-xs font-bold shrink-0">{{ u.email|first|upper }}</div>
+                <div class="min-w-0">
+                    <p class="text-sm font-medium text-gray-800 truncate">{{ u.email }}</p>
+                    <p class="text-xs text-gray-400">Joined {{ u.date_joined|timesince }} ago</p>
+                </div>
+                {% if u.is_verified %}<i class="fas fa-check-circle text-emerald-500 ml-auto text-xs"></i>{% endif %}
+            </a>
+            {% empty %}
+            <p class="px-5 py-8 text-center text-gray-400 text-sm">No users yet</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

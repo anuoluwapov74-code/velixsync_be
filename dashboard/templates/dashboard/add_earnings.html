@@ -1,0 +1,38 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Add Earnings - VelixSync Admin{% endblock %}
+{% block page_title %}Add Earnings{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+            <h3 class="font-semibold text-gray-800 mb-6">Add Earnings to User</h3>
+            <form method="post">{% csrf_token %}
+                <div class="space-y-4">
+                    <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.user_email.label }}</label>{{ form.user_email }}</div>
+                    <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.amount.label }}</label>{{ form.amount }}</div>
+                    <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.description.label }}</label>{{ form.description }}</div>
+                </div>
+                <button type="submit" class="mt-6 px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-500 transition">Add Earnings</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-100"><h4 class="text-sm font-semibold text-gray-700">Recent Earnings</h4></div>
+        <div class="divide-y divide-gray-100">
+            {% for e in recent_earnings %}
+            <div class="px-5 py-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-500 truncate max-w-[140px]">{{ e.user.email }}</span>
+                    <span class="text-sm font-semibold text-emerald-600">+${{ e.amount|floatformat:2 }}</span>
+                </div>
+                <p class="text-xs text-gray-400 mt-0.5">{{ e.created_at|timesince }} ago</p>
+            </div>
+            {% empty %}
+            <p class="px-5 py-8 text-center text-gray-400 text-sm">No recent earnings</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

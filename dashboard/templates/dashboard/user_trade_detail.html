@@ -1,0 +1,124 @@
+﻿{% extends "dashboard/base.html" %}
+{% load humanize %}
+{% block title %}{{ viewed_user.email }} Trades - VelixSync Admin{% endblock %}
+{% block page_title %}User Trade Detail{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="mb-4 space-y-2">
+    {% for message in messages %}
+    <div class="px-4 py-3 rounded-lg text-sm font-medium {% if message.tags == 'success' %}bg-emerald-50 text-emerald-800 border border-emerald-200{% else %}bg-red-50 text-red-800 border border-red-200{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- User header -->
+<div class="bg-white rounded-xl border border-gray-200/60 p-5 mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="flex items-center gap-4">
+        <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-2xl font-bold">
+            {{ viewed_user.email|first|upper }}
+        </div>
+        <div>
+            <h2 class="font-semibold text-gray-800 text-lg">{{ viewed_user.first_name }} {{ viewed_user.last_name }}</h2>
+            <p class="text-sm text-gray-400">{{ viewed_user.email }}</p>
+        </div>
+    </div>
+    <a href="{% url 'dashboard:add_user_trade' viewed_user.id %}"
+        class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition">
+        <i class="fas fa-plus"></i> Add Trade
+    </a>
+</div>
+
+<!-- Stats strip -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-4 text-center">
+        <p class="text-2xl font-bold text-gray-800">{{ total_trades }}</p>
+        <p class="text-xs text-gray-500">Total Trades</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200/60 p-4 text-center">
+        <p class="text-2xl font-bold text-blue-600">{{ open_trades }}</p>
+        <p class="text-xs text-gray-500">Open</p>
+    </div>
+    <div class="bg-white rounded-xl border border-gray-200/60 p-4 text-center">
+        <p class="text-2xl font-bold text-gray-500">{{ closed_trades }}</p>
+        <p class="text-xs text-gray-500">Closed</p>
+    </div>
+</div>
+
+<!-- Trades table -->
+<div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden mb-6">
+    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h4 class="text-sm font-semibold text-gray-700">Direct Trades</h4>
+        <span class="text-xs text-gray-500">{{ total_trades }} trade{{ total_trades|pluralize }}</span>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[900px]">
+            <thead>
+                <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                    <th class="px-5 py-3">Market</th>
+                    <th class="px-5 py-3">Direction</th>
+                    <th class="px-5 py-3">Entry</th>
+                    <th class="px-5 py-3">Exit</th>
+                    <th class="px-5 py-3">Investment</th>
+                    <th class="px-5 py-3">P/L %</th>
+                    <th class="px-5 py-3">P/L $</th>
+                    <th class="px-5 py-3">Status</th>
+                    <th class="px-5 py-3">Opened</th>
+                    <th class="px-5 py-3"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for trade in trades %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-5 py-3 font-medium text-gray-800">{{ trade.get_market_display }}</td>
+                    <td class="px-5 py-3">
+                        <span class="px-2 py-0.5 rounded text-xs font-medium {% if trade.direction == 'buy' %}bg-emerald-50 text-emerald-700{% else %}bg-red-50 text-red-700{% endif %}">
+                            {{ trade.direction|upper }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-3 text-gray-600">${{ trade.entry_price|floatformat:2|intcomma }}</td>
+                    <td class="px-5 py-3 text-gray-600">{% if trade.exit_price %}${{ trade.exit_price|floatformat:2|intcomma }}{% else %}<span class="text-gray-300">—</span>{% endif %}</td>
+                    <td class="px-5 py-3 text-gray-700">{% if trade.investment_amount %}${{ trade.investment_amount|floatformat:2|intcomma }}{% else %}<span class="text-gray-300">—</span>{% endif %}</td>
+                    <td class="px-5 py-3 font-semibold {% if trade.profit_loss_percent >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">
+                        {{ trade.profit_loss_percent }}%
+                    </td>
+                    <td class="px-5 py-3 font-semibold {% if trade.profit_loss_percent >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">
+                        {% if trade.investment_amount %}
+                        ${{ trade.calculate_user_profit_loss|floatformat:2|intcomma }}
+                        {% else %}<span class="text-gray-300">—</span>{% endif %}
+                    </td>
+                    <td class="px-5 py-3">
+                        <span class="px-2 py-0.5 rounded-full text-xs {% if trade.status == 'open' %}bg-blue-50 text-blue-700{% else %}bg-gray-100 text-gray-500{% endif %}">
+                            {{ trade.status|title }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-3 text-xs text-gray-400">{{ trade.opened_at|date:"M d, Y H:i" }}</td>
+                    <td class="px-5 py-3">
+                        <a href="{% url 'dashboard:edit_user_trade' viewed_user.id trade.id %}"
+                            class="inline-block px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded text-xs font-medium transition">
+                            <i class="fas fa-pencil-alt mr-1"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10" class="px-5 py-10 text-center text-gray-400">
+                        <i class="fas fa-chart-line text-2xl mb-2 block"></i>
+                        No direct trades for this user yet.
+                        <a href="{% url 'dashboard:add_user_trade' viewed_user.id %}" class="text-indigo-500 hover:underline ml-1">Add one now →</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<a href="{% url 'dashboard:users_trade_list' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition">
+    <i class="fas fa-arrow-left"></i> Back to User Trades
+</a>
+
+{% endblock %}

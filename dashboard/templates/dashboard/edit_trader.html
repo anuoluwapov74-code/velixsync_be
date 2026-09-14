@@ -1,0 +1,330 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Edit {{ trader.name }} - VelixSync Admin{% endblock %}
+{% block page_title %}Edit Trader{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl">
+    <!-- Display form errors if any -->
+    {% if form.errors %}
+    <div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
+        <h4 class="font-semibold text-red-800 mb-2">Please correct the following errors:</h4>
+        <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+            {% for field in form %}
+                {% for error in field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="flex items-center gap-4 mb-6">
+            {% if trader.avatar %}
+            <img src="{{ trader.avatar.url }}" class="w-12 h-12 rounded-full object-cover">
+            {% else %}
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-lg font-bold">{{ trader.name|first }}</div>
+            {% endif %}
+            <div>
+                <h3 class="font-semibold text-gray-800">Editing: {{ trader.name }}</h3>
+                <p class="text-sm text-gray-400">{{ trader.username }}</p>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Basic Info -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-user text-indigo-500"></i>Basic Information
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<p class="text-xs text-red-600 mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.username.label }}</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}<p class="text-xs text-red-600 mt-1">{{ form.username.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avatar.label }}</label>
+                    {{ form.avatar }}
+                    <p class="text-xs text-gray-400 mt-1">Leave blank to keep current</p>
+                    {% if form.avatar.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avatar.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.country_flag.label }}</label>
+                    {{ form.country_flag }}
+                    <p class="text-xs text-gray-400 mt-1">Leave blank to keep current</p>
+                    {% if form.country_flag.errors %}<p class="text-xs text-red-600 mt-1">{{ form.country_flag.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.country.label }}</label>
+                    {{ form.country }}
+                    {% if form.country.errors %}<p class="text-xs text-red-600 mt-1">{{ form.country.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.badge.label }}</label>
+                    {{ form.badge }}
+                    {% if form.badge.errors %}<p class="text-xs text-red-600 mt-1">{{ form.badge.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.bio.label }}</label>
+                    {{ form.bio }}
+                    {% if form.bio.errors %}<p class="text-xs text-red-600 mt-1">{{ form.bio.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Category & Display -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-tags text-blue-500"></i>Category & Display
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.category.label }}</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}<p class="text-xs text-red-600 mt-1">{{ form.category.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.trend_direction.label }}</label>
+                    {{ form.trend_direction }}
+                    {% if form.trend_direction.errors %}<p class="text-xs text-red-600 mt-1">{{ form.trend_direction.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-2">{{ form.tags.label }}</label>
+                    <p class="text-xs text-gray-500 mb-2">Add tags for this trader (e.g., "Trending Investors", "Rising Stars")</p>
+                    {{ form.tags }}
+                    {% if form.tags.errors %}<p class="text-xs text-red-600 mt-1">{{ form.tags.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Gain -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-line text-emerald-500"></i>Gain
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.gain.label }}</label>
+                    {{ form.gain }}
+                    {% if form.gain.errors %}<p class="text-xs text-red-600 mt-1">{{ form.gain.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Risk & Time -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-shield-alt text-amber-500"></i>Risk & Time
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.risk.label }}</label>
+                    {{ form.risk }}
+                    {% if form.risk.errors %}<p class="text-xs text-red-600 mt-1">{{ form.risk.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avg_trade_time.label }}</label>
+                    {{ form.avg_trade_time }}
+                    {% if form.avg_trade_time.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avg_trade_time.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Copiers & Trades -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-users text-blue-500"></i>Copiers & Trades
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.copiers.label }}</label>
+                    {{ form.copiers }}
+                    {% if form.copiers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.copiers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.trades.label }}</label>
+                    {{ form.trades }}
+                    {% if form.trades.errors %}<p class="text-xs text-red-600 mt-1">{{ form.trades.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Performance Stats -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-trophy text-yellow-500"></i>Performance Stats
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avg_profit_percent.label }}</label>
+                    {{ form.avg_profit_percent }}
+                    {% if form.avg_profit_percent.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avg_profit_percent.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avg_loss_percent.label }}</label>
+                    {{ form.avg_loss_percent }}
+                    {% if form.avg_loss_percent.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avg_loss_percent.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.total_wins.label }}</label>
+                    {{ form.total_wins }}
+                    {% if form.total_wins.errors %}<p class="text-xs text-red-600 mt-1">{{ form.total_wins.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.total_losses.label }}</label>
+                    {{ form.total_losses }}
+                    {% if form.total_losses.errors %}<p class="text-xs text-red-600 mt-1">{{ form.total_losses.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Additional Stats -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-bar text-purple-500"></i>Additional Stats
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.subscribers.label }}</label>
+                    {{ form.subscribers }}
+                    {% if form.subscribers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.subscribers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.followers.label }}</label>
+                    {{ form.followers }}
+                    {% if form.followers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.followers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.current_positions.label }}</label>
+                    {{ form.current_positions }}
+                    {% if form.current_positions.errors %}<p class="text-xs text-red-600 mt-1">{{ form.current_positions.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.expert_rating.label }}</label>
+                    {{ form.expert_rating }}
+                    {% if form.expert_rating.errors %}<p class="text-xs text-red-600 mt-1">{{ form.expert_rating.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Performance Metrics -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-pie text-green-500"></i>Performance Metrics
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.return_ytd.label }}</label>
+                    {{ form.return_ytd }}
+                    {% if form.return_ytd.errors %}<p class="text-xs text-red-600 mt-1">{{ form.return_ytd.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.return_2y.label }}</label>
+                    {{ form.return_2y }}
+                    {% if form.return_2y.errors %}<p class="text-xs text-red-600 mt-1">{{ form.return_2y.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.avg_score_7d.label }}</label>
+                    {{ form.avg_score_7d }}
+                    {% if form.avg_score_7d.errors %}<p class="text-xs text-red-600 mt-1">{{ form.avg_score_7d.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.profitable_weeks.label }}</label>
+                    {{ form.profitable_weeks }}
+                    {% if form.profitable_weeks.errors %}<p class="text-xs text-red-600 mt-1">{{ form.profitable_weeks.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.min_account_threshold.label }}</label>
+                    {{ form.min_account_threshold }}
+                    {% if form.min_account_threshold.errors %}<p class="text-xs text-red-600 mt-1">{{ form.min_account_threshold.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.profit_share.label }}</label>
+                    {{ form.profit_share }}
+                    {% if form.profit_share.errors %}<p class="text-xs text-red-600 mt-1">{{ form.profit_share.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Advanced Stats -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-cogs text-gray-500"></i>Advanced Stats
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.max_drawdown.label }}</label>
+                    {{ form.max_drawdown }}
+                    {% if form.max_drawdown.errors %}<p class="text-xs text-red-600 mt-1">{{ form.max_drawdown.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.cumulative_earnings_copiers.label }}</label>
+                    {{ form.cumulative_earnings_copiers }}
+                    {% if form.cumulative_earnings_copiers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.cumulative_earnings_copiers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.cumulative_copiers.label }}</label>
+                    {{ form.cumulative_copiers }}
+                    {% if form.cumulative_copiers.errors %}<p class="text-xs text-red-600 mt-1">{{ form.cumulative_copiers.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Advanced Data (User-Friendly Builders) -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-database text-indigo-500"></i>Additional Trading Data
+                <span class="text-xs font-normal text-gray-400">(Optional)</span>
+            </h4>
+            <div class="space-y-6 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Portfolio Breakdown</label>
+                    <p class="text-xs text-gray-500 mb-2">Add different asset types and their percentage allocation</p>
+                    {{ form.portfolio_breakdown }}
+                    {% if form.portfolio_breakdown.errors %}<p class="text-xs text-red-600 mt-1">{{ form.portfolio_breakdown.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Top Traded Assets</label>
+                    <p class="text-xs text-gray-500 mb-2">Add the trader's most frequently traded assets with performance stats</p>
+                    {{ form.top_traded }}
+                    {% if form.top_traded.errors %}<p class="text-xs text-red-600 mt-1">{{ form.top_traded.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Monthly Performance Chart Data</label>
+                    <p class="text-xs text-gray-500 mb-2">Add monthly performance values for the chart</p>
+                    {{ form.performance_data }}
+                    {% if form.performance_data.errors %}<p class="text-xs text-red-600 mt-1">{{ form.performance_data.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Monthly Performance Percentages</label>
+                    <p class="text-xs text-gray-500 mb-2">Add monthly performance as percentages</p>
+                    {{ form.monthly_performance }}
+                    {% if form.monthly_performance.errors %}<p class="text-xs text-red-600 mt-1">{{ form.monthly_performance.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-2">Frequently Traded Assets</label>
+                    <p class="text-xs text-gray-500 mb-2">Add asset tickers that this trader frequently trades</p>
+                    {{ form.frequently_traded }}
+                    {% if form.frequently_traded.errors %}<p class="text-xs text-red-600 mt-1">{{ form.frequently_traded.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Status -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-toggle-on text-green-500"></i>Status
+            </h4>
+            <div class="mb-8">
+                <div class="flex items-center gap-3">
+                    {{ form.is_active }}
+                    <label class="text-sm font-medium text-gray-600">{{ form.is_active.label }}</label>
+                </div>
+                {% if form.is_active.errors %}<p class="text-xs text-red-600 mt-1">{{ form.is_active.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="flex gap-3">
+                <button type="submit" class="px-8 py-3 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500 transition">
+                    Save Changes
+                </button>
+                <a href="{% url 'dashboard:trader_detail' trader.id %}" class="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Include JSON Builder Scripts -->
+{% include "dashboard/json_builder_scripts.html" %}
+{% endblock %}

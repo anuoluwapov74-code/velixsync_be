@@ -1,0 +1,62 @@
+﻿{% extends "dashboard/base.html" %}
+{% load humanize %}
+{% block title %}Copy Trades - VelixSync Admin{% endblock %}
+{% block page_title %}Copy Trades{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-xl border border-gray-200/60 p-4 mb-6">
+    <form method="get" class="flex flex-col sm:flex-row gap-3">
+        <div class="relative flex-1">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+            <input type="text" name="search" value="{{ search_query|default:'' }}" placeholder="Search market, trader, reference…"
+                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+        </div>
+        <select name="trader" class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+            <option value="">All Traders</option>
+            {% for t in traders %}<option value="{{ t.id }}" {% if current_trader == t.id|stringformat:"d" %}selected{% endif %}>{{ t.name }}</option>{% endfor %}
+        </select>
+        <select name="status" class="px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+            <option value="">All Status</option>
+            <option value="open" {% if current_status == 'open' %}selected{% endif %}>Open</option>
+            <option value="closed" {% if current_status == 'closed' %}selected{% endif %}>Closed</option>
+        </select>
+        <button type="submit" class="px-5 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Filter</button>
+    </form>
+</div>
+
+<div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[900px]">
+            <thead><tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                <th class="px-5 py-3">Trader</th><th class="px-5 py-3">Copiers</th><th class="px-5 py-3">Market</th><th class="px-5 py-3">Direction</th><th class="px-5 py-3">Amount</th><th class="px-5 py-3">P/L %</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Date</th><th class="px-5 py-3">Actions</th>
+            </tr></thead>
+            <tbody class="divide-y divide-gray-100">
+            {% for ct in copy_trades %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-5 py-3">
+                    <div class="flex items-center gap-2">
+                        {% if ct.trader.avatar %}<img src="{{ ct.trader.avatar.url }}" class="w-7 h-7 rounded-full object-cover">{% else %}<div class="w-7 h-7 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-[10px] font-bold">{{ ct.trader.name|first }}</div>{% endif %}
+                        <span class="text-xs font-medium">{{ ct.trader.name }}</span>
+                    </div>
+                </td>
+                <td class="px-5 py-3 text-xs text-gray-500">{{ ct.copying_users_count }}</td>
+                <td class="px-5 py-3 font-medium">{{ ct.market }}</td>
+                <td class="px-5 py-3"><span class="px-2 py-0.5 rounded text-xs font-medium {% if ct.direction == 'buy' %}bg-emerald-50 text-emerald-700{% else %}bg-red-50 text-red-700{% endif %}">{{ ct.direction|upper }}</span></td>
+                <td class="px-5 py-3">${{ ct.amount|floatformat:2|intcomma }}</td>
+                <td class="px-5 py-3 font-medium {% if ct.profit_loss_percent >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ ct.profit_loss_percent }}%</td>
+                <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-medium {% if ct.status == 'open' %}bg-blue-50 text-blue-700{% else %}bg-gray-100 text-gray-600{% endif %}">{{ ct.status|title }}</span></td>
+                <td class="px-5 py-3 text-xs text-gray-400">{{ ct.opened_at|date:"M d, H:i" }}</td>
+                <td class="px-5 py-3 flex gap-1">
+                    <a href="{% url 'dashboard:copy_trade_detail' ct.id %}" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded text-xs font-medium hover:bg-indigo-100 transition">View</a>
+                    <a href="{% url 'dashboard:edit_copy_trade' ct.id %}" class="px-2.5 py-1 bg-gray-50 text-gray-600 rounded text-xs font-medium hover:bg-gray-100 transition">Edit</a>
+                    <a href="{% url 'dashboard:delete_copy_trade' ct.id %}" class="px-2.5 py-1 bg-red-50 text-red-600 rounded text-xs font-medium hover:bg-red-100 transition">Del</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="9" class="px-5 py-12 text-center text-gray-400">No copy trades found</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

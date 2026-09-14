@@ -1,0 +1,33 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Edit Copy Trade #{{ copy_trade.id }} - VelixSync Admin{% endblock %}
+{% block page_title %}Edit Copy Trade{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        <div class="mb-6">
+            <h3 class="font-semibold text-gray-800">Edit Copy Trade #{{ copy_trade.id }}</h3>
+            <p class="text-sm text-gray-500 mt-1">Ref: {{ copy_trade.reference }} &middot; If you change status to "Closed", copying users' profit/balance will be updated.</p>
+        </div>
+        <form method="post">{% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.trader.label }}</label>{{ form.trader }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.market.label }}</label>{{ form.market }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.direction.label }}</label>{{ form.direction }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.duration.label }}</label>{{ form.duration }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.amount.label }}</label>{{ form.amount }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.entry_price.label }}</label>{{ form.entry_price }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.exit_price.label }}</label>{{ form.exit_price }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.profit_loss_percent.label }}</label>{{ form.profit_loss_percent }}{% if form.profit_loss_percent.help_text %}<p class="text-xs text-gray-400 mt-1">{{ form.profit_loss_percent.help_text }}</p>{% endif %}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.status.label }}</label>{{ form.status }}</div>
+                <div><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.closed_at.label }}</label>{{ form.closed_at }}</div>
+                <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-600 mb-1">{{ form.notes.label }}</label>{{ form.notes }}</div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button type="submit" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Save Changes</button>
+                <a href="{% url 'dashboard:copy_trade_detail' copy_trade.id %}" class="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

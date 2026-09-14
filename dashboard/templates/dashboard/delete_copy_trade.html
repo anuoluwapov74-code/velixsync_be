@@ -1,0 +1,32 @@
+﻿{% extends "dashboard/base.html" %}
+{% block title %}Delete Copy Trade #{{ copy_trade.id }} - VelixSync Admin{% endblock %}
+{% block page_title %}Delete Copy Trade{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto">
+    <div class="bg-white rounded-xl border border-red-200 p-6">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-800 text-lg">Confirm Deletion</h3>
+            <p class="text-sm text-gray-500 mt-2">Are you sure you want to delete this copy trade?</p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-4 mb-6 text-sm space-y-2">
+            <div class="flex justify-between"><span class="text-gray-500">Trade ID</span><span class="font-medium">#{{ copy_trade.id }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Trader</span><span class="font-medium">{{ copy_trade.trader.name }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Market</span><span class="font-medium">{{ copy_trade.market }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">P/L %</span><span class="font-medium {% if copy_trade.profit_loss_percent >= 0 %}text-emerald-600{% else %}text-red-600{% endif %}">{{ copy_trade.profit_loss_percent }}%</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Status</span><span class="font-medium">{{ copy_trade.status|title }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Reference</span><span class="font-mono text-xs">{{ copy_trade.reference }}</span></div>
+        </div>
+        <p class="text-xs text-red-600 mb-4">This action cannot be undone. User balances already affected by this trade will NOT be reverted.</p>
+        <div class="flex gap-3">
+            <form method="post" class="flex-1">{% csrf_token %}
+                <button type="submit" class="w-full px-4 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition">Delete Trade</button>
+            </form>
+            <a href="{% url 'dashboard:copy_trade_detail' copy_trade.id %}" class="flex-1 px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition text-center">Cancel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
