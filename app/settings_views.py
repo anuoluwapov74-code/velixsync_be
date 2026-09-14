@@ -4,9 +4,46 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from .models import PaymentMethod
+from .models import PaymentMethod, Transaction
 
 User = get_user_model()
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def loyalty_tiers(request):
+    """
+    GET /api/auth/loyalty-tiers/ — full tier table + this user's progress,
+    for the Loyalty Program tab on /market. One endpoint serves both the
+    compact "current/next tier" view and the full tier-breakdown table.
+    """
+    from decimal import Decimal
+    from django.db.models import Sum
+
+    user = request.user
+    total_deposits = Transaction.objects.filter(
+        user=user, transaction_type="deposit", status="completed",
+    ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+
+    tiers = [
+        {
+            "key": key,
+            "name": key.capitalize(),
+            "min_deposit": cfg["min_deposit"],
+            "referral_bonus": cfg["referral_bonus"],
+            "rank_bonus": cfg["rank_bonus"],
+        }
+        for key, cfg in User.LOYALTY_TIER_CONFIG.items()
+    ]
+
+    return Response({
+        "tiers": tiers,
+        "current_tier": user.current_loyalty_status,
+        "next_tier": user.next_loyalty_status,
+        "total_deposits": float(total_deposits),
+        "next_amount_to_upgrade": float(user.next_amount_to_upgrade),
+        "visible": user.make_royalty_program_visible,
+    })
 
 
 @api_view(["GET"])

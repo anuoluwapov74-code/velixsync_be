@@ -50,9 +50,76 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Loyalty Status
     LOYALTY_TIERS = [
         ('iron', 'Iron'),
+        ('bronze', 'Bronze'),
         ('silver', 'Silver'),
         ('gold', 'Gold'),
+        ('platinum', 'Platinum'),
+        ('diamond', 'Diamond'),
+        ('elite', 'Elite'),
     ]
+    LOYALTY_TIER_ORDER = ["iron", "bronze", "silver", "gold", "platinum", "diamond", "elite"]
+    LOYALTY_TIER_CONFIG = {
+        "iron":     {"min_deposit": 2500,    "referral_bonus": 5,  "rank_bonus": 0},
+        "bronze":   {"min_deposit": 5000,    "referral_bonus": 5,  "rank_bonus": 50},
+        "silver":   {"min_deposit": 25000,   "referral_bonus": 10, "rank_bonus": 250},
+        "gold":     {"min_deposit": 100000,  "referral_bonus": 10, "rank_bonus": 1000},
+        "platinum": {"min_deposit": 250000,  "referral_bonus": 12, "rank_bonus": 2500},
+        "diamond":  {"min_deposit": 500000,  "referral_bonus": 12, "rank_bonus": 5000},
+        "elite":    {"min_deposit": 1000000, "referral_bonus": 15, "rank_bonus": 10000},
+    }
+
+    def update_loyalty_tier(self):
+        """Check total completed deposits and upgrade the loyalty tier if
+        eligible. Credits the rank-bonus difference to balance on upgrade.
+        Only ever upgrades — never downgrades. Returns True if an upgrade
+        occurred. Call this after a deposit Transaction is marked completed."""
+        from decimal import Decimal
+        from django.db.models import Sum
+
+        total_deposits = Transaction.objects.filter(
+            user=self, transaction_type="deposit", status="completed",
+        ).aggregate(total=Sum("amount"))["total"] or Decimal("0")
+
+        new_tier = "iron"
+        for tier_key in self.LOYALTY_TIER_ORDER:
+            if total_deposits >= self.LOYALTY_TIER_CONFIG[tier_key]["min_deposit"]:
+                new_tier = tier_key
+
+        old_tier = self.current_loyalty_status
+        old_index = self.LOYALTY_TIER_ORDER.index(old_tier) if old_tier in self.LOYALTY_TIER_ORDER else 0
+        new_index = self.LOYALTY_TIER_ORDER.index(new_tier)
+        if new_index <= old_index:
+            return False
+
+        old_rank_bonus = Decimal(str(self.LOYALTY_TIER_CONFIG.get(old_tier, {}).get("rank_bonus", 0)))
+        new_rank_bonus = Decimal(str(self.LOYALTY_TIER_CONFIG[new_tier]["rank_bonus"]))
+        bonus_credit = new_rank_bonus - old_rank_bonus
+
+        self.current_loyalty_status = new_tier
+        if new_index < len(self.LOYALTY_TIER_ORDER) - 1:
+            next_tier = self.LOYALTY_TIER_ORDER[new_index + 1]
+            self.next_loyalty_status = next_tier
+            self.next_amount_to_upgrade = Decimal(str(self.LOYALTY_TIER_CONFIG[next_tier]["min_deposit"]))
+        else:
+            self.next_loyalty_status = new_tier
+            self.next_amount_to_upgrade = Decimal("0")
+
+        if bonus_credit > 0:
+            self.balance += bonus_credit
+
+        self.save(update_fields=["current_loyalty_status", "next_loyalty_status", "next_amount_to_upgrade", "balance"])
+
+        Notification.objects.create(
+            user=self,
+            type="system",
+            title="Royalty Rank Upgraded!",
+            message=f"Congratulations! You have been upgraded to {new_tier.capitalize()} tier.",
+            full_details=(
+                f"Congratulations! You have been upgraded to {new_tier.capitalize()} tier. "
+                f"Rank bonus credited: ${bonus_credit:.2f}."
+            ),
+        )
+        return True
 
     # KYC Fields
     title = models.CharField(
@@ -246,6 +313,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         decimal_places=2,
         default=5000.00,
         help_text="Total bonus earned from referrals"
+    )
+
+    make_royalty_program_visible = models.BooleanField(
+        default=False,
+        help_text=(
+            "Admin-controlled gate for the Royalty Program tab on /market. "
+            "While False, the tab's content is shown blurred with a locked "
+            "notice overlaid; set to True once the user's capital meets the "
+            "trader-assigned threshold to unlock it."
+        ),
     )
 
     # Referral System Fields

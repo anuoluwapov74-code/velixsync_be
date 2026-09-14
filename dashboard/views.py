@@ -492,6 +492,7 @@ def deposit_detail(request, transaction_id):
             if status == 'completed':
                 deposit.user.balance += deposit.amount
                 deposit.user.save()
+                deposit.user.update_loyalty_tier()
                 Notification.objects.create(user=deposit.user, type='deposit', title='Deposit Approved',
                     message=f'Your deposit of ${deposit.amount} has been approved.',
                     full_details=f'Amount: ${deposit.amount}\nReference: {deposit.reference}')
@@ -533,6 +534,7 @@ def edit_deposit(request, transaction_id):
                 elif old_status != 'completed' and deposit.status == 'completed':
                     deposit.user.balance += deposit.amount
                     deposit.user.save()
+                    deposit.user.update_loyalty_tier()
                     messages.success(request, f'${deposit.amount} credited to {deposit.user.email} balance.')
             elif deposit.status == 'completed' and old_amount != deposit.amount:
                 diff = deposit.amount - old_amount

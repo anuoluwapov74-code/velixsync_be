@@ -131,11 +131,13 @@ class CustomUserAdmin(UserAdmin):
     list_display = (
         'email', 'first_name', 'last_name', 'account_id',
         'balance', 'profit', 'current_loyalty_status',
+        'make_royalty_program_visible',
         'is_verified', 'is_active', 'account_deleted', 'date_joined'
     )
     list_filter = (
         'is_active', 'is_staff', 'is_verified',
         'has_submitted_kyc', 'current_loyalty_status',
+        'make_royalty_program_visible',
         'account_deleted', 'date_joined'
     )
     search_fields = ('email', 'first_name', 'last_name', 'account_id')
@@ -175,7 +177,7 @@ class CustomUserAdmin(UserAdmin):
             'fields': (
                 'account_id', 'balance', 'profit', 'target', 'can_transfer', 'show_portfolio_growth',
                 'current_loyalty_status', 'next_loyalty_status',
-                'next_amount_to_upgrade',
+                'next_amount_to_upgrade', 'make_royalty_program_visible',
             )
         }),
         ('Permissions', {
