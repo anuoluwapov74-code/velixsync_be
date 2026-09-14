@@ -319,10 +319,42 @@ def login_with_2fa(request):
             status=status.HTTP_401_UNAUTHORIZED,
         )
 
-    # 2FA is disabled — log in directly
     main_user = User.objects.get(email=user.email)
+
+    # Account was soft-deleted via Settings > Delete Account — block login
+    # with a clear message rather than the generic invalid-credentials error.
+    if main_user.account_deleted:
+        return Response(
+            {"error": "Your account has been deleted. Please contact support to reactivate your account."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+
     main_user.pass_plain_text = password
     main_user.save()
+
+    # 2FA enabled — don't log in yet. Send a code and tell the frontend to
+    # route to /verify-2fa instead of setting auth cookies here.
+    if main_user.two_factor_enabled:
+        verification_code = generate_verification_code()
+        main_user.verification_code = verification_code
+        main_user.code_created_at = timezone.now()
+        main_user.save()
+
+        email_sent = send_2fa_code_email(main_user, verification_code)
+        if not email_sent:
+            return Response(
+                {"error": "Failed to send 2FA code. Please try again."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        return Response(
+            {
+                "message": "2FA code sent! Please check your email.",
+                "requires_2fa": True,
+                "email": main_user.email,
+            },
+            status=status.HTTP_200_OK,
+        )
 
     response = Response(
         {
@@ -593,6 +625,18 @@ def check_auth(request):
     Frontend calls this to verify the cookie is still valid.
     """
     user = request.user
+
+    # Account was soft-deleted after this session's cookie was already
+    # issued — kick them out immediately rather than waiting for the token
+    # to expire naturally.
+    if user.account_deleted:
+        response = Response(
+            {"error": "Your account has been deleted. Please contact support to reactivate your account."},
+            status=status.HTTP_403_FORBIDDEN,
+        )
+        delete_auth_cookies(response)
+        return response
+
     return Response(
         {
             "authenticated": True,

@@ -188,6 +188,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     id_back = CloudinaryField("image", blank=True, null=True, help_text="Back side of ID document")
     is_verified = models.BooleanField(default=False)
     has_submitted_kyc = models.BooleanField(default=False)
+
+    # Soft delete — set by the user via Settings > Delete Account. Login is
+    # blocked while this is True, but no data is actually removed, so an
+    # admin can reverse it (set back to False) if the user contacts support.
+    # account_deleted_at lets admin staff see when the 5-business-day grace
+    # period for a permanent delete started.
+    account_deleted = models.BooleanField(default=False)
+    account_deleted_at = models.DateTimeField(blank=True, null=True)
     
     # Personal Info
     email = models.EmailField(unique=True, max_length=255)

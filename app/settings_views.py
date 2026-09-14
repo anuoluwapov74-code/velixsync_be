@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from .models import PaymentMethod
 
 User = get_user_model()
@@ -218,3 +219,52 @@ def update_payment_method(request):
             "address": payment_method.address,
         },
     })
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    """
+    Soft-delete the user's account (Settings > Delete Account).
+
+    This never removes any data — it just flags the account so login is
+    blocked, exactly like disabling it. If the user contacts support, an
+    admin can reverse this by setting account_deleted back to False (or
+    using the "Reactivate selected accounts" action) in the Django admin.
+    Requires password confirmation, same pattern as disabling 2FA.
+    """
+    user = request.user
+    password = request.data.get("password")
+
+    if not password:
+        return Response(
+            {"error": "Password is required to delete your account"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not user.check_password(password):
+        return Response(
+            {"error": "Invalid password"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    user.account_deleted = True
+    user.account_deleted_at = timezone.now()
+    user.save()
+
+    # Blacklist existing refresh tokens so the account is logged out
+    # everywhere immediately, not just in the tab that requested this.
+    from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
+    outstanding = OutstandingToken.objects.filter(user=user)
+    for token in outstanding:
+        try:
+            BlacklistedToken.objects.get_or_create(token=token)
+        except Exception:
+            pass
+
+    from .auth_views import delete_auth_cookies
+    response = Response({
+        "message": "Your account has been deleted. Contact support if you'd like to reactivate it.",
+    })
+    delete_auth_cookies(response)
+    return response

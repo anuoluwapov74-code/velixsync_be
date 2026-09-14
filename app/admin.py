@@ -129,14 +129,14 @@ class CustomUserAdmin(UserAdmin):
     """Admin configuration for CustomUser model"""
     
     list_display = (
-        'email', 'first_name', 'last_name', 'account_id', 
-        'balance', 'profit', 'current_loyalty_status', 
-        'is_verified', 'is_active', 'date_joined'
+        'email', 'first_name', 'last_name', 'account_id',
+        'balance', 'profit', 'current_loyalty_status',
+        'is_verified', 'is_active', 'account_deleted', 'date_joined'
     )
     list_filter = (
-        'is_active', 'is_staff', 'is_verified', 
-        'has_submitted_kyc', 'current_loyalty_status', 
-        'date_joined'
+        'is_active', 'is_staff', 'is_verified',
+        'has_submitted_kyc', 'current_loyalty_status',
+        'account_deleted', 'date_joined'
     )
     search_fields = ('email', 'first_name', 'last_name', 'account_id')
     ordering = ('-date_joined',)
@@ -180,9 +180,19 @@ class CustomUserAdmin(UserAdmin):
         }),
         ('Permissions', {
             'fields': (
-                'is_active', 'is_staff', 'is_superuser', 
+                'is_active', 'is_staff', 'is_superuser',
                 'groups', 'user_permissions'
             )
+        }),
+        ('Account Deletion (user-initiated, soft delete)', {
+            'fields': ('account_deleted', 'account_deleted_at'),
+            'description': (
+                'Set by the user via Settings > Delete Account — blocks login only, '
+                'no data is removed. Contacted within 5 business days? Uncheck '
+                '"account deleted" (or use the "Reactivate" action below) to restore '
+                'access. Not contacted? Use "Delete selected users" from the actions '
+                'dropdown above to permanently remove the account.'
+            ),
         }),
         ('Important Dates', {
             'fields': ('last_login', 'date_joined')
@@ -199,9 +209,22 @@ class CustomUserAdmin(UserAdmin):
         }),
     )
     
-    readonly_fields = ('date_joined', 'last_login', 'account_id')
+    readonly_fields = ('date_joined', 'last_login', 'account_id', 'account_deleted_at')
 
-    actions = ['generate_password_reset_link']
+    actions = ['generate_password_reset_link', 'reactivate_accounts']
+
+    @admin.action(description="Reactivate account(s) — undo a user-requested delete")
+    def reactivate_accounts(self, request, queryset):
+        """
+        Support action for when a user who deleted their own account (via
+        Settings > Delete Account) gets back in touch. Just clears the flag —
+        no data was ever touched by the soft delete, so there's nothing else
+        to restore.
+        """
+        updated = queryset.filter(account_deleted=True).update(
+            account_deleted=False, account_deleted_at=None,
+        )
+        self.message_user(request, f"Reactivated {updated} account(s).")
 
     @admin.action(description="Generate password reset link (bypass email)")
     def generate_password_reset_link(self, request, queryset):

@@ -100,6 +100,7 @@ from app.settings_views import (
     update_profile,
     change_password,
     update_payment_method,
+    delete_account,
 )
 from app.transfer_views import (
     transfer_info,
@@ -237,6 +238,7 @@ urlpatterns = [
     path('api/auth/settings/profile/', update_profile, name='update-profile'),
     path('api/auth/settings/password/', change_password, name='change-password'),
     path('api/auth/settings/payment-method/', update_payment_method, name='update-payment-method'),
+    path('api/auth/settings/delete-account/', delete_account, name='delete-account'),
 
     # Transfer
     path('api/auth/transfer/info/', transfer_info, name='transfer-info'),
