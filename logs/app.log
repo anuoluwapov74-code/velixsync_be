@@ -12158,3 +12158,348 @@
 2026-09-13 22:49:47,825 INFO app.authentication: 🔍 Cookies present: []
 2026-09-13 22:49:47,825 INFO app.authentication: ❌ No access_token in cookies
 2026-09-13 22:49:47,825 INFO app.authentication: ❌ No Authorization header
+2026-09-14 01:41:02,318 INFO app.authentication: 🔍 Auth attempt for: /api/auth/traders/
+2026-09-14 01:41:02,324 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 01:41:02,324 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 01:41:02,325 INFO app.authentication: ❌ No Authorization header
+2026-09-14 01:41:05,636 INFO app.authentication: 🔍 Auth attempt for: /api/auth/traders/
+2026-09-14 01:41:05,636 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 01:41:05,636 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 01:41:05,636 INFO app.authentication: ❌ No Authorization header
+2026-09-14 01:46:20,425 INFO app.authentication: 🔍 Auth attempt for: /api/auth/traders/
+2026-09-14 01:46:20,437 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 01:46:20,444 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 01:46:20,444 INFO app.authentication: ❌ No Authorization header
+2026-09-14 01:46:25,096 INFO app.authentication: 🔍 Auth attempt for: /api/auth/traders/
+2026-09-14 01:46:25,097 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 01:46:25,097 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 01:46:25,097 INFO app.authentication: ❌ No Authorization header
+2026-09-14 01:49:24,293 INFO app.authentication: 🔍 Auth attempt for: /api/auth/traders/
+2026-09-14 01:49:24,294 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 01:49:24,294 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 01:49:24,294 INFO app.authentication: ❌ No Authorization header
+2026-09-14 01:49:24,985 INFO app.authentication: 🔍 Auth attempt for: /api/auth/traders/
+2026-09-14 01:49:24,986 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 01:49:24,986 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 01:49:24,987 INFO app.authentication: ❌ No Authorization header
+2026-09-14 01:52:10,801 INFO app.authentication: 🔍 Auth attempt for: /api/auth/login/
+2026-09-14 01:52:10,801 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__']
+2026-09-14 01:52:10,802 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 01:52:10,803 INFO app.authentication: ❌ No Authorization header
+2026-09-14 01:52:32,168 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 01:52:32,169 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:32,170 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:34,194 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:52:34,251 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 01:52:34,252 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:34,253 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:36,244 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:52:36,508 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/trades/
+2026-09-14 01:52:36,512 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:36,511 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/following/
+2026-09-14 01:52:36,515 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 01:52:36,516 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:36,519 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:36,527 INFO app.authentication: 🔍 Auth attempt for: /api/auth/profile/
+2026-09-14 01:52:36,527 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:36,533 INFO app.authentication: 🔍 Auth attempt for: /api/auth/deposits/history/
+2026-09-14 01:52:36,543 INFO app.authentication: 🔍 Auth attempt for: /api/auth/withdrawals/history/
+2026-09-14 01:52:36,545 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:36,546 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:36,546 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:36,547 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:36,548 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:36,553 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:36,560 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:36,561 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:38,507 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:52:38,534 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:52:38,545 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:52:38,565 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:52:38,645 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:52:38,655 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:52:57,213 INFO app.authentication: 🔍 Auth attempt for: /api/auth/traders/
+2026-09-14 01:52:57,213 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:52:57,213 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:52:59,283 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:53:06,646 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 01:53:06,646 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:53:06,647 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:53:08,728 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 01:53:20,332 INFO app.authentication: 🔍 Auth attempt for: /api/auth/stocks/
+2026-09-14 01:53:20,333 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:53:20,333 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:53:39,328 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 01:53:39,329 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:53:39,332 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:53:59,731 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 01:53:59,731 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:53:59,732 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:54:37,673 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 01:54:37,675 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:54:37,676 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:55:44,552 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 01:55:44,567 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:55:44,568 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:57:20,014 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 01:57:20,014 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:57:20,015 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 01:57:47,025 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 01:57:47,027 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', '__next_hmr_refresh_hash__', 'access_token', 'refresh_token']
+2026-09-14 01:57:47,027 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:22,518 INFO app.authentication: 🔍 Auth attempt for: /api/auth/login/
+2026-09-14 02:06:22,519 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:06:22,519 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:06:22,519 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:06:26,304 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:06:26,304 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', 'access_token', 'refresh_token', '__next_hmr_refresh_hash__']
+2026-09-14 02:06:26,304 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:28,749 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 02:06:29,009 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:06:29,010 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', 'access_token', 'refresh_token', '__next_hmr_refresh_hash__']
+2026-09-14 02:06:29,011 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:31,102 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 02:06:33,946 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:06:33,947 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:06:33,947 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:35,915 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:06:36,120 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:06:36,120 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:06:36,122 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/following/
+2026-09-14 02:06:36,124 INFO app.authentication: 🔍 Auth attempt for: /api/auth/profile/
+2026-09-14 02:06:36,125 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/trades/
+2026-09-14 02:06:36,126 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:36,127 INFO app.authentication: 🔍 Auth attempt for: /api/auth/deposits/history/
+2026-09-14 02:06:36,128 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:06:36,128 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:06:36,128 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:06:36,131 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:36,131 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:36,131 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:36,130 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:06:36,136 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:37,964 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:06:37,968 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:06:37,977 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:06:37,965 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:06:37,969 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:06:39,201 INFO app.authentication: 🔍 Auth attempt for: /api/auth/withdrawals/history/
+2026-09-14 02:06:39,201 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:06:39,201 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:41,196 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:06:55,327 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:06:55,327 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token', '__next_hmr_refresh_hash__']
+2026-09-14 02:06:55,327 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:06:57,520 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:06:58,632 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:06:58,633 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', 'access_token', 'refresh_token', '__next_hmr_refresh_hash__']
+2026-09-14 02:06:58,633 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:07:00,750 INFO app.authentication: ✅ Authentication successful for user: admin@gmail.com
+2026-09-14 02:07:01,052 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:07:01,053 INFO app.authentication: 🔍 Cookies present: ['csrftoken_citadelsmarket', 'csrftoken', 'access_token', 'refresh_token', '__next_hmr_refresh_hash__']
+2026-09-14 02:07:01,053 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:07:01,244 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:07:01,245 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token', '__next_hmr_refresh_hash__']
+2026-09-14 02:07:01,245 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:07:05,406 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:07:05,407 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token', '__next_hmr_refresh_hash__']
+2026-09-14 02:07:05,407 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:07:41,400 INFO app.authentication: 🔍 Auth attempt for: /api/auth/login/
+2026-09-14 02:07:41,400 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:07:41,400 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:07:41,402 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:08:05,804 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:08:05,805 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:08:05,805 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:08:05,805 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:08:23,095 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:08:23,096 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:08:23,096 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:08:23,097 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:09:09,473 INFO app.authentication: 🔍 Auth attempt for: /api/auth/login/
+2026-09-14 02:09:09,473 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:09:09,474 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:09:09,476 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:10:51,840 INFO app.authentication: 🔍 Auth attempt for: /api/auth/login/
+2026-09-14 02:10:51,840 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:10:51,840 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:10:51,841 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:11:17,593 INFO app.authentication: 🔍 Auth attempt for: /api/auth/login/
+2026-09-14 02:11:17,594 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:11:17,594 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:11:17,594 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:11:28,422 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:11:28,423 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:11:28,423 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:15:45,851 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:15:45,852 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:15:45,852 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:15:47,947 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:15:48,173 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:15:48,173 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:15:48,173 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:15:48,177 INFO app.authentication: 🔍 Auth attempt for: /api/auth/calendar/
+2026-09-14 02:15:48,178 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:15:48,178 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:15:48,179 INFO app.authentication: 🔍 Auth attempt for: /api/auth/calendar/seasonality/
+2026-09-14 02:15:48,184 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:15:48,185 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:15:48,187 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/history/
+2026-09-14 02:15:48,189 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:15:48,189 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:15:49,958 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:15:50,151 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:15:50,153 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:15:50,170 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:15:58,687 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:15:58,687 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:15:58,688 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:00,556 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:00,713 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:16:00,714 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:00,714 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:00,727 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/trades/
+2026-09-14 02:16:00,729 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/following/
+2026-09-14 02:16:00,733 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:00,733 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:00,731 INFO app.authentication: 🔍 Auth attempt for: /api/auth/profile/
+2026-09-14 02:16:00,732 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:00,738 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:00,737 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:00,740 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:00,742 INFO app.authentication: 🔍 Auth attempt for: /api/auth/withdrawals/history/
+2026-09-14 02:16:00,737 INFO app.authentication: 🔍 Auth attempt for: /api/auth/deposits/history/
+2026-09-14 02:16:00,744 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:00,744 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:00,744 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:00,747 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:02,462 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:02,499 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:02,548 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:02,559 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:02,594 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:02,646 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:06,667 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:16:06,668 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:06,669 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:08,735 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:08,986 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:16:08,987 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:08,987 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:09,005 INFO app.authentication: 🔍 Auth attempt for: /api/auth/calendar/
+2026-09-14 02:16:09,010 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:09,009 INFO app.authentication: 🔍 Auth attempt for: /api/auth/calendar/seasonality/
+2026-09-14 02:16:09,011 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:09,021 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/history/
+2026-09-14 02:16:09,021 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:09,028 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:09,027 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:16:09,034 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:16:10,986 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:10,992 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:10,996 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:16:11,010 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:02,178 INFO app.authentication: 🔍 Auth attempt for: /api/auth/login/
+2026-09-14 02:17:02,179 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:17:02,180 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:17:02,180 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:17:11,409 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:17:11,409 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:11,410 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:13,334 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:13,744 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:17:13,745 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:13,745 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:13,787 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/trades/
+2026-09-14 02:17:13,787 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:13,790 INFO app.authentication: 🔍 Auth attempt for: /api/auth/profile/
+2026-09-14 02:17:13,792 INFO app.authentication: 🔍 Auth attempt for: /api/auth/deposits/history/
+2026-09-14 02:17:13,793 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:13,796 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/following/
+2026-09-14 02:17:13,796 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:13,801 INFO app.authentication: 🔍 Auth attempt for: /api/auth/withdrawals/history/
+2026-09-14 02:17:13,801 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:13,806 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:13,807 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:13,808 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:13,808 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:13,809 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:13,813 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:15,691 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:15,736 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:15,739 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:15,736 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:15,741 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:16,009 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:22,488 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:17:22,488 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:22,488 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:24,406 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:24,519 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:17:24,520 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:24,520 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:24,524 INFO app.authentication: 🔍 Auth attempt for: /api/auth/calendar/
+2026-09-14 02:17:24,524 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:24,525 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:24,529 INFO app.authentication: 🔍 Auth attempt for: /api/auth/calendar/seasonality/
+2026-09-14 02:17:24,529 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:24,529 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:24,536 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/history/
+2026-09-14 02:17:24,537 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:17:24,538 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:17:26,311 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:26,663 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:26,669 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:17:26,670 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:36,225 INFO app.authentication: 🔍 Auth attempt for: /api/auth/login/
+2026-09-14 02:18:36,226 INFO app.authentication: 🔍 Cookies present: []
+2026-09-14 02:18:36,226 INFO app.authentication: ❌ No access_token in cookies
+2026-09-14 02:18:36,226 INFO app.authentication: ❌ No Authorization header
+2026-09-14 02:18:43,413 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:18:43,413 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:43,414 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:45,311 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:45,637 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:18:45,638 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:45,638 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:45,677 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/trades/
+2026-09-14 02:18:45,680 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:45,679 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/following/
+2026-09-14 02:18:45,684 INFO app.authentication: 🔍 Auth attempt for: /api/auth/profile/
+2026-09-14 02:18:45,685 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:45,688 INFO app.authentication: 🔍 Auth attempt for: /api/auth/deposits/history/
+2026-09-14 02:18:45,689 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:45,690 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:45,698 INFO app.authentication: 🔍 Auth attempt for: /api/auth/withdrawals/history/
+2026-09-14 02:18:45,699 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:45,700 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:45,701 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:45,701 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:45,702 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:45,710 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:47,409 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:47,545 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:47,551 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:47,555 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:47,664 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:47,746 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:54,673 INFO app.authentication: 🔍 Auth attempt for: /api/auth/check/
+2026-09-14 02:18:54,674 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:54,675 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:56,588 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:56,883 INFO app.authentication: 🔍 Auth attempt for: /api/auth/notifications/recent/
+2026-09-14 02:18:56,884 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:56,884 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:56,896 INFO app.authentication: 🔍 Auth attempt for: /api/auth/calendar/
+2026-09-14 02:18:56,896 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:56,899 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:56,898 INFO app.authentication: 🔍 Auth attempt for: /api/auth/calendar/seasonality/
+2026-09-14 02:18:56,902 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:56,904 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:56,904 INFO app.authentication: 🔍 Auth attempt for: /api/auth/copy-trader/history/
+2026-09-14 02:18:56,907 INFO app.authentication: 🔍 Cookies present: ['access_token', 'refresh_token']
+2026-09-14 02:18:56,907 INFO app.authentication: ✅ Found access_token in cookies (length: 231)
+2026-09-14 02:18:58,773 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:58,782 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:58,788 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
+2026-09-14 02:18:58,811 INFO app.authentication: ✅ Authentication successful for user: claude.verify.test@example.com
