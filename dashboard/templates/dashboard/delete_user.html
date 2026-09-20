@@ -47,8 +47,9 @@
 
         <form method="post">
             {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
             <div class="flex gap-3">
-                <a href="{% url 'dashboard:user_detail' view_user.id %}"
+                <a href="{% if next == 'kyc' %}{% url 'dashboard:kyc_requests' %}{% else %}{% url 'dashboard:user_detail' view_user.id %}{% endif %}"
                    class="flex-1 text-center px-5 py-3 bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-200 transition">
                     Cancel
                 </a>

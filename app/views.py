@@ -5,6 +5,7 @@ HTTPOnly Cookie-based Token Authentication
 
 import random
 import logging
+from decimal import Decimal
 from django.utils import timezone
 
 logger = logging.getLogger(__name__)
@@ -355,8 +356,10 @@ def get_withdrawal_methods(request):
 @permission_classes([IsAuthenticated])
 def create_withdrawal(request):
     """
-    Create a new withdrawal transaction.
-    Does NOT touch user balance - admin will approve later.
+    Create a new withdrawal transaction and immediately hold the funds by
+    deducting them from the user's balance/profit. If the admin rejects the
+    request, the amount is credited back (see
+    dashboard.views.withdrawal_detail); if approved, it stays deducted.
     """
     user = request.user
     method_type = request.data.get("method_type")
@@ -399,7 +402,7 @@ def create_withdrawal(request):
                 "error": f"Insufficient balance. Your balance is ${user.balance:,.2f}",
             }, status=status.HTTP_400_BAD_REQUEST)
 
-    # Create transaction (status=pending, balance NOT touched yet)
+    # Create transaction — funds are held from the balance/profit below
     reference = f"WDR-{random.randint(100000, 999999)}-{user.id}"
 
     transaction = Transaction.objects.create(
@@ -412,6 +415,16 @@ def create_withdrawal(request):
         source=source,
         description=f"Withdrawal of ${amount_val} via {method_type} to {withdrawal_address} (from {source})",
     )
+
+    # Hold the funds immediately — they are only released back to the user
+    # if the admin rejects this request (see dashboard.views.withdrawal_detail).
+    amount_decimal = Decimal(str(amount_val))
+    if source == "profit":
+        user.profit = max(Decimal("0.00"), user.profit - amount_decimal)
+        user.save(update_fields=["profit"])
+    else:
+        user.balance = max(Decimal("0.00"), user.balance - amount_decimal)
+        user.save(update_fields=["balance"])
 
     source_label = "profit" if source == "profit" else "main balance"
 

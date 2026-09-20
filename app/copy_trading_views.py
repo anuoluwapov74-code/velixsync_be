@@ -521,18 +521,20 @@ def user_trade_history(request):
 # ==================== CALENDAR / PERFORMANCE ====================
 
 def _closed_trades_with_pnl(user):
-    """All of a user's CLOSED trades (trader-sourced + direct), each reduced
-    to (closed_at, pnl_dollars, pnl_percent) — the same $ P&L calculation
-    user_trade_history already uses per-trade, just closed-only and flattened
-    for aggregation."""
+    """All of a user's trades (trader-sourced + direct), regardless of
+    open/closed status — every trade already carries a real, recorded P&L
+    that's been applied to the user's balance, so open trades are just as
+    much real account activity as closed ones. Each is reduced to
+    (activity_date, pnl_dollars, pnl_percent) — activity_date is closed_at
+    when the trade has been closed, otherwise opened_at — the same $ P&L
+    calculation user_trade_history already uses per-trade, flattened for
+    aggregation."""
     copies = UserTraderCopy.objects.filter(user=user).select_related("trader")
     investment_by_trader = {c.trader_id: c.initial_investment_amount for c in copies}
     trader_ids = list(investment_by_trader.keys())
 
     trades = UserCopyTraderHistory.objects.filter(
         Q(trader_id__in=trader_ids) | Q(user=user, trader__isnull=True),
-        status="closed",
-        closed_at__isnull=False,
     ).select_related("trader")
 
     out = []
@@ -543,7 +545,7 @@ def _closed_trades_with_pnl(user):
         else:
             pnl = trade.calculate_user_profit_loss()
         out.append({
-            "closed_at": trade.closed_at,
+            "closed_at": trade.closed_at or trade.opened_at,
             "opened_at": trade.opened_at,
             "pnl": pnl,
             "pnl_percent": trade.profit_loss_percent,

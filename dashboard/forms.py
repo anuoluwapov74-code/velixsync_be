@@ -1,4 +1,5 @@
 from django import forms
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from app.models import CustomUser, Stock, Transaction, Trader, UserCopyTraderHistory, AdminWallet, Card
 from decimal import Decimal
@@ -190,15 +191,25 @@ class AddCopyTradeForm(forms.Form):
     status = forms.ChoiceField(
         choices=[('', 'Select Status')] + list(UserCopyTraderHistory.STATUS_CHOICES),
         label="Trade Status", widget=forms.Select(attrs={'class': _select}),
+        initial='closed',
     )
     closed_at = forms.DateTimeField(
-        label="Close Date & Time (Optional)", required=False,
+        label="Close Date & Time (Optional — defaults to now if status is Closed)", required=False,
         widget=forms.DateTimeInput(attrs={'class': _input, 'type': 'datetime-local'}),
     )
     notes = forms.CharField(
         label="Notes (Optional)", required=False,
         widget=forms.Textarea(attrs={'class': _textarea, 'rows': 3, 'placeholder': 'Additional notes…'}),
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # A "closed" trade with no closed_at is invisible to the calendar/stats
+        # views (they require status="closed" AND closed_at set) — default it
+        # to now so a completed trade is never silently excluded.
+        if cleaned_data.get('status') == 'closed' and not cleaned_data.get('closed_at'):
+            cleaned_data['closed_at'] = timezone.now()
+        return cleaned_data
 
 
 # ===== Trader Forms =====
@@ -804,15 +815,25 @@ class AddUserDirectTradeForm(forms.Form):
     status = forms.ChoiceField(
         choices=[('', 'Select Status')] + list(UserCopyTraderHistory.STATUS_CHOICES),
         label="Trade Status", widget=forms.Select(attrs={'class': _select}),
+        initial='closed',
     )
     closed_at = forms.DateTimeField(
-        label="Close Date & Time (Optional)", required=False,
+        label="Close Date & Time (Optional — defaults to now if status is Closed)", required=False,
         widget=forms.DateTimeInput(attrs={'class': _input, 'type': 'datetime-local'}),
     )
     notes = forms.CharField(
         label="Notes (Optional)", required=False,
         widget=forms.Textarea(attrs={'class': _textarea, 'rows': 3, 'placeholder': 'Additional notes…'}),
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # A "closed" trade with no closed_at is invisible to the calendar/stats
+        # views (they require status="closed" AND closed_at set) — default it
+        # to now so a completed trade is never silently excluded.
+        if cleaned_data.get('status') == 'closed' and not cleaned_data.get('closed_at'):
+            cleaned_data['closed_at'] = timezone.now()
+        return cleaned_data
 
 
 class EditTraderForm(AddTraderForm):

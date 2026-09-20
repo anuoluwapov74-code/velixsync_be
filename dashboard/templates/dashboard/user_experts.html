@@ -102,7 +102,7 @@
                         <span class="font-medium text-gray-800">{{ rel.user.first_name }} {{ rel.user.last_name }}</span>
                     </div>
                 </td>
-                <td class="px-5 py-3 text-gray-600">{{ rel.user.email }}</td>
+                <td class="px-5 py-3 text-gray-600"><a href="{% url 'dashboard:user_detail' rel.user.id %}" class="text-indigo-600 hover:text-indigo-500 hover:underline">{{ rel.user.email }}</a></td>
                 <td class="px-5 py-3">
                     <a href="{% url 'dashboard:trader_detail' rel.trader.id %}" class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline">
                         {{ rel.trader.name }}
@@ -164,7 +164,7 @@
                         <span class="font-medium text-gray-800">{{ rel.user.first_name }} {{ rel.user.last_name }}</span>
                     </div>
                 </td>
-                <td class="px-5 py-3 text-gray-600">{{ rel.user.email }}</td>
+                <td class="px-5 py-3 text-gray-600"><a href="{% url 'dashboard:user_detail' rel.user.id %}" class="text-indigo-600 hover:text-indigo-500 hover:underline">{{ rel.user.email }}</a></td>
                 <td class="px-5 py-3">
                     <a href="{% url 'dashboard:trader_detail' rel.trader.id %}" class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline">
                         {{ rel.trader.name }}

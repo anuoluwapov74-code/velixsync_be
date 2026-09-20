@@ -341,14 +341,20 @@ def user_edit(request, user_id):
 @admin_required
 def delete_user(request, user_id):
     view_user = get_object_or_404(CustomUser, id=user_id)
+    next_param = request.POST.get('next') or request.GET.get('next')
+
+    def _fallback_redirect():
+        if next_param == 'kyc':
+            return redirect('dashboard:kyc_requests')
+        return redirect('dashboard:user_detail', user_id=user_id)
 
     if view_user.is_superuser:
         messages.error(request, "Superuser accounts cannot be deleted.")
-        return redirect('dashboard:user_detail', user_id=user_id)
+        return _fallback_redirect()
 
     if request.user.id == view_user.id:
         messages.error(request, "You cannot delete your own account.")
-        return redirect('dashboard:user_detail', user_id=user_id)
+        return _fallback_redirect()
 
     if request.method == 'POST':
         email = view_user.email
@@ -392,12 +398,14 @@ def delete_user(request, user_id):
                 view_user.delete()
 
             messages.success(request, f"User {email} has been permanently deleted.")
+            if next_param == 'kyc':
+                return redirect('dashboard:kyc_requests')
             return redirect('dashboard:users_list')
         except Exception as e:
             messages.error(request, f"Could not delete user: {e}")
-            return redirect('dashboard:user_detail', user_id=user_id)
+            return _fallback_redirect()
 
-    return render(request, 'dashboard/delete_user.html', {'view_user': view_user})
+    return render(request, 'dashboard/delete_user.html', {'view_user': view_user, 'next': next_param})
 
 
 # ---------------------------------------------------------------------------
@@ -579,6 +587,9 @@ def withdrawals(request):
 def withdrawal_detail(request, transaction_id):
     withdrawal = get_object_or_404(Transaction, id=transaction_id, transaction_type='withdrawal')
     if request.method == 'POST':
+        if withdrawal.status != 'pending':
+            messages.error(request, 'This withdrawal has already been processed.')
+            return redirect('dashboard:withdrawal_detail', transaction_id=withdrawal.id)
         form = ApproveWithdrawalForm(request.POST)
         if form.is_valid():
             status = form.cleaned_data['status']
@@ -586,23 +597,25 @@ def withdrawal_detail(request, transaction_id):
             withdrawal.status = status
             withdrawal.save()
             source = withdrawal.source or 'balance'
+            source_label = 'profit' if source == 'profit' else 'main balance'
             if status == 'completed':
-                # Deduct from the correct source
-                if source == 'profit':
-                    withdrawal.user.profit -= withdrawal.amount
-                else:
-                    withdrawal.user.balance -= withdrawal.amount
-                withdrawal.user.save()
-                source_label = 'profit' if source == 'profit' else 'main balance'
+                # Funds were already held from the user's balance/profit when
+                # the withdrawal was requested — nothing more to deduct here.
                 Notification.objects.create(user=withdrawal.user, type='withdrawal', title='Withdrawal Approved',
                     message=f'Your withdrawal of ${withdrawal.amount} from {source_label} has been processed.',
                     full_details=f'Amount: ${withdrawal.amount}\nSource: {source_label}\nReference: {withdrawal.reference}')
                 messages.success(request, f'Withdrawal approved for {withdrawal.user.email}')
             else:
+                # Rejected — credit the held amount back to the source it came from.
+                if source == 'profit':
+                    withdrawal.user.profit += withdrawal.amount
+                else:
+                    withdrawal.user.balance += withdrawal.amount
+                withdrawal.user.save()
                 Notification.objects.create(user=withdrawal.user, type='alert', title='Withdrawal Rejected',
-                    message=f'Your withdrawal of ${withdrawal.amount} was not processed.',
-                    full_details=admin_notes or 'Your withdrawal request has been rejected.')
-                messages.warning(request, f'Withdrawal rejected for {withdrawal.user.email}')
+                    message=f'Your withdrawal of ${withdrawal.amount} was not processed and has been refunded to your {source_label}.',
+                    full_details=admin_notes or 'Your withdrawal request has been rejected and the amount has been returned to your account.')
+                messages.warning(request, f'Withdrawal rejected for {withdrawal.user.email} — funds refunded.')
             return redirect('dashboard:withdrawals')
     else:
         form = ApproveWithdrawalForm()

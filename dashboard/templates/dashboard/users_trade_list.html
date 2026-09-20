@@ -75,6 +75,8 @@
                         <th class="px-5 py-3 w-10"></th>
                         <th class="px-5 py-3">User</th>
                         <th class="px-5 py-3">Email</th>
+                        <th class="px-5 py-3">Balance</th>
+                        <th class="px-5 py-3">Profit (ROI)</th>
                         <th class="px-5 py-3">Joined</th>
                         <th class="px-5 py-3">Actions</th>
                     </tr>
@@ -95,7 +97,9 @@
                                 <span class="font-medium text-gray-800">{{ u.first_name }} {{ u.last_name }}</span>
                             </div>
                         </td>
-                        <td class="px-5 py-3 text-gray-600">{{ u.email }}</td>
+                        <td class="px-5 py-3 text-gray-600"><a href="{% url 'dashboard:user_detail' u.id %}" class="text-indigo-600 hover:text-indigo-500 hover:underline">{{ u.email }}</a></td>
+                        <td class="px-5 py-3 font-medium text-gray-800">${{ u.balance|floatformat:2 }}</td>
+                        <td class="px-5 py-3 font-medium {% if u.profit > 0 %}text-emerald-600{% elif u.profit < 0 %}text-red-500{% else %}text-gray-600{% endif %}">${{ u.profit|floatformat:2 }}</td>
                         <td class="px-5 py-3 text-xs text-gray-400">{{ u.date_joined|date:"M d, Y" }}</td>
                         <td class="px-5 py-3 flex gap-2">
                             <a href="{% url 'dashboard:user_trade_detail' u.id %}"
@@ -110,7 +114,7 @@
                     </tr>
                     {% empty %}
                     <tr id="no-users-row">
-                        <td colspan="5" class="px-5 py-10 text-center text-gray-400">
+                        <td colspan="7" class="px-5 py-10 text-center text-gray-400">
                             <i class="fas fa-users text-2xl mb-2 block"></i>
                             No users found.
                         </td>
@@ -118,7 +122,7 @@
                     {% endfor %}
                     {% if users %}
                     <tr id="no-filter-empty" style="display:none">
-                        <td colspan="5" class="px-5 py-10 text-center text-gray-400">
+                        <td colspan="7" class="px-5 py-10 text-center text-gray-400">
                             <i class="fas fa-search text-2xl mb-2 block"></i>
                             No users match your search.
                         </td>
