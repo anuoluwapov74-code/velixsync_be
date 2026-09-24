@@ -20,6 +20,7 @@ from .email_service import (
     send_admin_payment_intent_notification,
     send_admin_deposit_notification,
     send_admin_withdrawal_notification,
+    send_admin_withdrawal_intent_notification,
 )
 
 
@@ -349,6 +350,54 @@ def get_withdrawal_methods(request):
     return Response({
         "success": True,
         "methods": method_list,
+    })
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def withdrawal_intent(request):
+    """
+    Notify admin that a user is confirming a withdrawal. Fired by the frontend
+    right before the real withdrawal request; never creates a Transaction and
+    never touches the user's funds.
+    """
+    user = request.user
+    currency = request.data.get("method_type")
+    amount = request.data.get("amount")
+    address = request.data.get("withdrawal_address", "")
+    source = request.data.get("source", "balance")
+
+    if not currency or not amount:
+        return Response({
+            "success": False,
+            "error": "Method and amount are required.",
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        amount_val = Decimal(str(amount))
+        if amount_val <= 0:
+            raise ValueError
+    except (ArithmeticError, ValueError, TypeError):
+        return Response({
+            "success": False,
+            "error": "Please enter a valid amount.",
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    source_label = "Profit" if source == "profit" else "Main Balance"
+
+    try:
+        sent = send_admin_withdrawal_intent_notification(user, currency, amount_val, source_label, address)
+        if not sent:
+            logger.error(
+                "withdrawal_intent: email failed for user=%s currency=%s amount=%s",
+                user.email, currency, amount_val,
+            )
+    except Exception as exc:
+        logger.exception("withdrawal_intent: unexpected error sending intent email: %s", exc)
+
+    return Response({
+        "success": True,
+        "message": "Withdrawal intent recorded.",
     })
 
 

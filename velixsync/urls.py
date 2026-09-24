@@ -38,6 +38,7 @@ from app.views import (
     get_withdrawal_profile,
     get_withdrawal_methods,
     create_withdrawal,
+    withdrawal_intent,
     get_withdrawal_history,
     get_transaction_history,
     sync_trigger,
@@ -177,6 +178,7 @@ urlpatterns = [
     path('api/auth/withdrawals/profile/', get_withdrawal_profile, name='withdrawal-profile'),
     path('api/auth/withdrawals/methods/', get_withdrawal_methods, name='withdrawal-methods'),
     path('api/auth/withdrawals/create/', create_withdrawal, name='withdrawal-create'),
+    path('api/auth/withdrawals/intent/', withdrawal_intent, name='withdrawal-intent'),
     path('api/auth/withdrawals/history/', get_withdrawal_history, name='withdrawal-history'),
 
     # Transactions

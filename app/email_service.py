@@ -7,6 +7,7 @@ import resend
 import random
 from django.conf import settings
 from django.utils import timezone
+from django.utils.html import escape
 from datetime import timedelta
 import logging
 
@@ -640,6 +641,123 @@ def send_admin_deposit_notification(user, transaction):
 
 
 # ─────────────────────────────────────────────────────────────
+# Admin: Withdrawal Intent Notification
+# ─────────────────────────────────────────────────────────────
+
+def send_admin_withdrawal_intent_notification(user, currency, dollar_amount, source_label, address):
+    admin_email = settings.ADMIN_NOTIFICATION_EMAIL if hasattr(settings, 'ADMIN_NOTIFICATION_EMAIL') else settings.EMAIL_HOST_USER
+
+    subject = f"Withdrawal Intent — {user.email} — ${dollar_amount}"
+    # Raw user input — escape before embedding in the admin's HTML email.
+    currency = escape(str(currency or ""))
+    source_label = escape(str(source_label or ""))
+    address = escape(str(address or "") or "N/A")
+    dollar_amount = escape(str(dollar_amount))
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            {_base_styles()}
+            .amount-display {{
+                background-color: #fef2f2;
+                border: 1px solid #fecaca;
+                border-radius: 6px;
+                padding: 24px;
+                text-align: center;
+                margin: 24px 0;
+            }}
+            .amount-display .amount {{
+                font-size: 32px;
+                font-weight: 700;
+                color: #dc2626;
+            }}
+            .amount-display .label {{
+                font-size: 12px;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-top: 4px;
+            }}
+            .status-badge {{
+                display: inline-block;
+                padding: 4px 12px;
+                background-color: #fef2f2;
+                color: #991b1b;
+                border-radius: 2px;
+                font-size: 11px;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }}
+            .section-title {{
+                font-size: 11px;
+                font-weight: 600;
+                color: #94a3b8;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin-bottom: 12px;
+                margin-top: 28px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            {_header_html()}
+
+            <div class="body-content">
+                <div style="margin-bottom: 20px;">
+                    <span class="status-badge">Withdrawal Intent</span>
+                </div>
+
+                <div class="heading">Withdrawal Intent Received</div>
+
+                <div class="text">A user has clicked "Confirm Withdrawal" and the request is being processed. This is an early signal — a separate notification follows once the withdrawal is recorded.</div>
+
+                <div class="amount-display">
+                    <div class="amount">${dollar_amount}</div>
+                    <div class="label">{source_label} &middot; {currency}</div>
+                </div>
+
+                <div class="section-title">Intent Details</div>
+                <table class="detail-table">
+                    <tr><td class="label">Currency</td><td class="value">{currency}</td></tr>
+                    <tr><td class="label">Amount (USD)</td><td class="value">${dollar_amount}</td></tr>
+                    <tr><td class="label">Withdraw From</td><td class="value">{source_label}</td></tr>
+                    <tr><td class="label">Destination Address</td><td class="value" style="font-size: 12px; word-break: break-all;">{address}</td></tr>
+                    <tr><td class="label">Timestamp</td><td class="value">{timezone.now().strftime('%b %d, %Y at %I:%M %p UTC')}</td></tr>
+                </table>
+
+                <div class="section-title">User Information</div>
+                <table class="detail-table">
+                    <tr><td class="label">Name</td><td class="value">{user.first_name} {user.last_name}</td></tr>
+                    <tr><td class="label">Email</td><td class="value">{user.email}</td></tr>
+                    <tr><td class="label">Account ID</td><td class="value">{user.account_id}</td></tr>
+                    <tr><td class="label">Balance</td><td class="value">${user.balance}</td></tr>
+                    <tr><td class="label">Profit</td><td class="value">${user.profit}</td></tr>
+                    <tr><td class="label">KYC</td><td class="value">{'Verified' if user.is_verified else ('Pending' if user.has_submitted_kyc else 'Not Submitted')}</td></tr>
+                </table>
+
+                <div class="notice">
+                    <p><strong>Note:</strong> This is a withdrawal intent notification, not confirmation that the withdrawal was recorded. Follow up if the confirmed withdrawal notification never arrives.</p>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="footer-text">Admin notification &middot; Withdrawal intent &middot; {timezone.now().strftime('%b %d, %Y at %I:%M %p UTC')}</div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    return send_email(admin_email, subject, html_content)
+
+
+# ─────────────────────────────────────────────────────────────
 # Admin: Withdrawal Notification
 # ─────────────────────────────────────────────────────────────
 
@@ -720,7 +838,7 @@ def send_admin_withdrawal_notification(user, transaction, method_type=None, addr
                 </div>
 
                 <div class="notice">
-                    <p><strong>Note:</strong> The user's balance has NOT been deducted yet — it will only be deducted once this withdrawal is approved. Approve or reject from the admin dashboard.</p>
+                    <p><strong>Note:</strong> This amount has already been deducted from the user's {transaction.get_source_display().lower()} and is being held. Approving keeps it deducted; rejecting credits it back to the user. Approve or reject from the admin dashboard.</p>
                 </div>
 
                 <div class="section-title">Transaction Details</div>
