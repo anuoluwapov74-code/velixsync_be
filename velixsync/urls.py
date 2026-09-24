@@ -47,6 +47,8 @@ from app.views import (
 from app.copy_trading_views import (
     list_traders,
     trader_detail,
+    trader_portfolio,
+    mirror_trader_portfolio,
     copy_trader_action,
     copy_trader_status,
     user_copied_trades,
@@ -187,6 +189,8 @@ urlpatterns = [
     # Copy Trading
     path('api/auth/traders/', list_traders, name='list-traders'),
     path('api/auth/traders/<int:trader_id>/', trader_detail, name='trader-detail'),
+    path('api/auth/traders/<int:trader_id>/portfolio/', trader_portfolio, name='trader-portfolio'),
+    path('api/auth/traders/<int:trader_id>/portfolio/mirror/', mirror_trader_portfolio, name='trader-portfolio-mirror'),
     path('api/auth/copy-trader/action/', copy_trader_action, name='copy-trader-action'),
     path('api/auth/copy-trader/status/<int:trader_id>/', copy_trader_status, name='copy-trader-status'),
     path('api/auth/copy-trader/trades/', user_copied_trades, name='user-copied-trades'),

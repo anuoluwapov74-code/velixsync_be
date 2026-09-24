@@ -9,6 +9,7 @@ from .models import (
     Trader, 
     # Asset,
     TraderPortfolio,
+    UserTraderPortfolioMirror,
     UserTraderCopy,
     Notification,
     Portfolio,
@@ -718,10 +719,26 @@ class UserSignalPurchaseAdmin(admin.ModelAdmin):
 admin.site.register(UserTraderCopy)
 
 
+@admin.register(UserTraderPortfolioMirror)
+class UserTraderPortfolioMirrorAdmin(admin.ModelAdmin):
+    list_display = ['user', 'trader', 'balance_at_unlock', 'created_at']
+    search_fields = ['user__email', 'trader__name']
+    list_filter = ['trader']
+
+
+class TraderPortfolioInline(admin.TabularInline):
+    """Open positions shown on the trader's Portfolio tab."""
+    model = TraderPortfolio
+    extra = 0
+    fields = ('market', 'name', 'logo_url', 'direction', 'invested', 'profit_loss', 'value', 'is_active')
+
+
 @admin.register(Trader)
 class TraderAdmin(admin.ModelAdmin):
     """Admin configuration for Trader model"""
-    
+
+    inlines = [TraderPortfolioInline]
+
     list_display = [
         'name',
         'username',
@@ -802,6 +819,12 @@ class TraderAdmin(admin.ModelAdmin):
                 'current_positions',
                 'min_account_threshold',
                 'expert_rating'
+            )
+        }),
+        ('Portfolio Visibility', {
+            'fields': (
+                'blur_portfolio',
+                'blur_portfolio_amount',
             )
         }),
         ('Performance Statistics', {

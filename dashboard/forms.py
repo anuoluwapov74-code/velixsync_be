@@ -430,6 +430,18 @@ class AddTraderForm(forms.Form):
         help_text=''
     )
 
+    # --- Portfolio Visibility ---
+    blur_portfolio = forms.BooleanField(
+        label="Blur Portfolio tab", required=False, initial=True,
+        widget=forms.CheckboxInput(attrs={'class': _checkbox}),
+        help_text="On: users must unlock the Portfolio tab. Off: it is always visible."
+    )
+    blur_portfolio_amount = forms.DecimalField(
+        label="Blur Portfolio Amount ($)", max_digits=20, decimal_places=2, required=False, initial=0.00, min_value=0,
+        widget=forms.NumberInput(attrs={'class': _input, 'placeholder': '1000.00', 'step': '0.01', 'min': '0'}),
+        help_text="Minimum user balance needed to view and mirror this trader's portfolio"
+    )
+
     # --- Status ---
     is_active = forms.BooleanField(
         label="Active (Available for Copying)", required=False, initial=True,

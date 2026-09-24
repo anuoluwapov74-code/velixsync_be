@@ -239,6 +239,11 @@
                     {{ form.profit_share }}
                     {% if form.profit_share.errors %}<p class="text-xs text-red-600 mt-1">{{ form.profit_share.errors.0 }}</p>{% endif %}
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.copy_value.label }}</label>
+                    {{ form.copy_value }}
+                    {% if form.copy_value.errors %}<p class="text-xs text-red-600 mt-1">{{ form.copy_value.errors.0 }}</p>{% endif %}
+                </div>
             </div>
 
             <!-- Advanced Stats -->
@@ -298,6 +303,27 @@
                     <p class="text-xs text-gray-500 mb-2">Add asset tickers that this trader frequently trades</p>
                     {{ form.frequently_traded }}
                     {% if form.frequently_traded.errors %}<p class="text-xs text-red-600 mt-1">{{ form.frequently_traded.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Portfolio Visibility -->
+            <h4 class="text-sm font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-eye-slash text-indigo-500"></i>Portfolio Visibility
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                    <div class="flex items-center gap-3">
+                        {{ form.blur_portfolio }}
+                        <label class="text-sm font-medium text-gray-600">{{ form.blur_portfolio.label }}</label>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">{{ form.blur_portfolio.help_text }}</p>
+                    {% if form.blur_portfolio.errors %}<p class="text-xs text-red-600 mt-1">{{ form.blur_portfolio.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">{{ form.blur_portfolio_amount.label }}</label>
+                    {{ form.blur_portfolio_amount }}
+                    <p class="text-xs text-gray-500 mt-1">{{ form.blur_portfolio_amount.help_text }}</p>
+                    {% if form.blur_portfolio_amount.errors %}<p class="text-xs text-red-600 mt-1">{{ form.blur_portfolio_amount.errors.0 }}</p>{% endif %}
                 </div>
             </div>
 

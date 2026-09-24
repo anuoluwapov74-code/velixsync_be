@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db.models import Q, Sum, Count
 from django.utils import timezone
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import transaction
 from decimal import Decimal
@@ -11,7 +12,7 @@ from decimal import Decimal
 from app.models import (
     CustomUser, Transaction, Stock, AdminWallet,
     Portfolio, Notification, UserStockPosition,
-    Trader, UserCopyTraderHistory, UserTraderCopy,
+    Trader, UserCopyTraderHistory, UserTraderCopy, UserTraderPortfolioMirror,
     WalletConnection, Card,
 )
 from .forms import (
@@ -1023,6 +1024,10 @@ def _build_trader_data(form):
         'monthly_performance': parse_json(d.get('monthly_performance'), []),
         'frequently_traded': parse_json(d.get('frequently_traded'), []),
 
+        # Portfolio visibility
+        'blur_portfolio': bool(d.get('blur_portfolio')),
+        'blur_portfolio_amount': d.get('blur_portfolio_amount') or Decimal('0.00'),
+
         # Status
         'is_active': d.get('is_active', True),
     }
@@ -1149,6 +1154,10 @@ def edit_trader(request, trader_id):
             'performance_data': json.dumps(trader.performance_data) if trader.performance_data else '',
             'monthly_performance': json.dumps(trader.monthly_performance) if trader.monthly_performance else '',
             'frequently_traded': json.dumps(trader.frequently_traded) if trader.frequently_traded else '',
+
+            # Portfolio visibility
+            'blur_portfolio': trader.blur_portfolio,
+            'blur_portfolio_amount': trader.blur_portfolio_amount,
 
             # Status
             'is_active': trader.is_active,
@@ -1283,21 +1292,39 @@ def user_experts(request):
         active_qs = active_qs.filter(q)
         cancel_qs = cancel_qs.filter(q)
 
+    mirror_qs = UserTraderPortfolioMirror.objects.select_related('user', 'trader').order_by('-created_at')
+    if search:
+        mirror_qs = mirror_qs.filter(q)
+
     if trader_filter:
         active_qs = active_qs.filter(trader_id=trader_filter)
         cancel_qs = cancel_qs.filter(trader_id=trader_filter)
+        mirror_qs = mirror_qs.filter(trader_id=trader_filter)
 
     traders = Trader.objects.filter(is_active=True).order_by('name')
 
     return render(request, 'dashboard/user_experts.html', {
         'active_copiers': active_qs,
         'cancel_requests': cancel_qs,
+        'portfolio_mirrors': mirror_qs,
         'traders': traders,
         'search': search,
         'trader_filter': trader_filter,
         'active_count': active_qs.count(),
         'cancel_count': cancel_qs.count(),
+        'mirror_count': mirror_qs.count(),
     })
+
+
+@admin_required
+@require_POST
+def revoke_portfolio_mirror(request, mirror_id):
+    """Admin removes a user's unlocked access to a trader's blurred portfolio."""
+    mirror = get_object_or_404(UserTraderPortfolioMirror.objects.select_related('user', 'trader'), id=mirror_id)
+    email, trader_name = mirror.user.email, mirror.trader.name
+    mirror.delete()
+    messages.success(request, f"Revoked {email}'s access to {trader_name}'s portfolio.")
+    return redirect('dashboard:user_experts')
 
 
 # ---------------------------------------------------------------------------

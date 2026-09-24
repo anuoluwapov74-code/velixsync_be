@@ -42,6 +42,11 @@
             <div class="flex justify-between"><span class="text-gray-500">Expert Rating</span><span>{{ trader.expert_rating }}/5</span></div>
             <div class="flex justify-between"><span class="text-gray-500">Min Threshold</span><span>${{ trader.min_account_threshold|floatformat:2|intcomma }}</span></div>
             <div class="flex justify-between"><span class="text-gray-500">Profit Share</span><span class="font-semibold text-indigo-600">{{ trader.profit_share }}%</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Copy Value</span><span>${{ trader.copy_value|floatformat:2|intcomma }}</span></div>
+            <div class="flex justify-between"><span class="text-gray-500">Portfolio Blurred</span><span class="font-semibold {% if trader.blur_portfolio %}text-amber-600{% else %}text-gray-500{% endif %}">{% if trader.blur_portfolio %}Yes{% else %}No{% endif %}</span></div>
+            {% if trader.blur_portfolio %}
+            <div class="flex justify-between"><span class="text-gray-500">Portfolio Unlock Balance</span><span>${{ trader.blur_portfolio_amount|floatformat:2|intcomma }}</span></div>
+            {% endif %}
         </div>
         <a href="{% url 'dashboard:edit_trader' trader.id %}" class="block mt-5 text-center px-4 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">Edit Trader</a>
     </div>

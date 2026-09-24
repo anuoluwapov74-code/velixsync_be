@@ -200,4 +200,68 @@
     </div>
 </div>
 
+<!-- ── TABLE 3: Portfolio Mirrors ──────────────────────────────────── -->
+<div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden mt-6">
+    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+            <h4 class="text-sm font-semibold text-gray-700">Portfolio Mirrors</h4>
+            <span class="ml-1 px-2 py-0.5 bg-indigo-50 text-indigo-600 text-xs font-semibold rounded-full">{{ mirror_count }}</span>
+        </div>
+        <p class="text-xs text-gray-400">Users who unlocked a trader's blurred portfolio</p>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase tracking-wider">
+                    <th class="px-5 py-3">User</th>
+                    <th class="px-5 py-3">Email</th>
+                    <th class="px-5 py-3">Trader</th>
+                    <th class="px-5 py-3">Unlock Balance</th>
+                    <th class="px-5 py-3">Balance at Unlock</th>
+                    <th class="px-5 py-3">Unlocked</th>
+                    <th class="px-5 py-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+            {% for m in portfolio_mirrors %}
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-5 py-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 text-xs font-bold shrink-0">
+                            {{ m.user.email|first|upper }}
+                        </div>
+                        <span class="font-medium text-gray-800">{{ m.user.first_name }} {{ m.user.last_name }}</span>
+                    </div>
+                </td>
+                <td class="px-5 py-3 text-gray-600"><a href="{% url 'dashboard:user_detail' m.user.id %}" class="text-indigo-600 hover:text-indigo-500 hover:underline">{{ m.user.email }}</a></td>
+                <td class="px-5 py-3">
+                    <a href="{% url 'dashboard:trader_detail' m.trader.id %}" class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline">{{ m.trader.name }}</a>
+                </td>
+                <td class="px-5 py-3 font-semibold text-gray-800">${{ m.trader.blur_portfolio_amount|floatformat:2|intcomma }}</td>
+                <td class="px-5 py-3 text-gray-600">${{ m.balance_at_unlock|floatformat:2|intcomma }}</td>
+                <td class="px-5 py-3 text-xs text-gray-400">{{ m.created_at|date:"M d, Y" }}</td>
+                <td class="px-5 py-3">
+                    <form method="post" action="{% url 'dashboard:revoke_portfolio_mirror' m.id %}" onsubmit="return confirm('Revoke {{ m.user.email|escapejs }}\'s access to this trader\'s portfolio? It will be blurred for them again.');">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 rounded-lg text-xs font-medium transition border border-red-200">
+                            <i class="fas fa-eye-slash"></i> Revoke
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="px-5 py-10 text-center text-gray-400">
+                    <i class="fas fa-eye-slash text-3xl mb-2 block opacity-30"></i>
+                    No portfolio mirrors{% if search or trader_filter %} matching your filters{% endif %}.
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 {% endblock %}
