@@ -56,6 +56,13 @@ urlpatterns = [
     path('user-experts/', views.user_experts, name='user_experts'),
     path('portfolio-mirrors/<int:mirror_id>/revoke/', views.revoke_portfolio_mirror, name='revoke_portfolio_mirror'),
 
+    # Custom / bulk client emails
+    path('emails/', views.custom_email_list, name='custom_email_list'),
+    path('emails/compose/', views.custom_email_compose, name='custom_email_compose'),
+    path('emails/history/', views.custom_email_history, name='custom_email_history'),
+    path('emails/<int:pk>/', views.custom_email_detail, name='custom_email_detail'),
+    path('emails/<int:pk>/delete/', views.custom_email_delete, name='custom_email_delete'),
+
     # User Direct Trades
     path('user-trades/', views.users_trade_list, name='users_trade_list'),
     path('user-trades/<int:user_id>/', views.user_trade_detail, name='user_trade_detail'),

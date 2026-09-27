@@ -1,0 +1,61 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Email History - VelixSync Admin{% endblock %}
+{% block page_title %}Email History{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <p class="text-sm text-gray-500">Previously sent custom email campaigns</p>
+    <a href="{% url 'dashboard:custom_email_list' %}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition">
+        <i class="fas fa-envelope text-xs"></i>New Email
+    </a>
+</div>
+
+<div class="bg-white rounded-xl border border-gray-200/60 overflow-hidden">
+    {% if page_obj.object_list %}
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm min-w-[800px]">
+            <thead><tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
+                <th class="px-5 py-3">Subject</th>
+                <th class="px-5 py-3">Recipients</th>
+                <th class="px-5 py-3">Sent</th>
+                <th class="px-5 py-3">Failed</th>
+                <th class="px-5 py-3">Sent By</th>
+                <th class="px-5 py-3">Date</th>
+                <th class="px-5 py-3">Actions</th>
+            </tr></thead>
+            <tbody class="divide-y divide-gray-100">
+            {% for c in page_obj %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-5 py-3">
+                    <a href="{% url 'dashboard:custom_email_detail' c.pk %}" class="font-medium text-gray-800 hover:underline">{{ c.subject }}</a>
+                    {% if c.heading %}<p class="text-xs mt-0.5 text-gray-400">{{ c.heading }}</p>{% endif %}
+                </td>
+                <td class="px-5 py-3 text-gray-700">{{ c.recipient_count }}</td>
+                <td class="px-5 py-3"><span class="px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700">{{ c.sent_count }}</span></td>
+                <td class="px-5 py-3">
+                    {% if c.failed_count > 0 %}<span class="px-2 py-0.5 rounded-full text-xs bg-red-50 text-red-600">{{ c.failed_count }}</span>
+                    {% else %}<span class="text-gray-300">—</span>{% endif %}
+                </td>
+                <td class="px-5 py-3 text-gray-500 text-xs">{{ c.sent_by.email|default:"—" }}</td>
+                <td class="px-5 py-3 text-gray-500 text-xs">{{ c.created_at|date:"M d, Y H:i" }}</td>
+                <td class="px-5 py-3">
+                    <div class="flex items-center gap-2">
+                        <a href="{% url 'dashboard:custom_email_detail' c.pk %}" class="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-lg text-xs font-medium hover:bg-indigo-100 transition">View Details</a>
+                        <a href="{% url 'dashboard:custom_email_delete' c.pk %}" class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition">Delete</a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="px-5 py-14 text-center text-gray-400">
+        <i class="fas fa-envelope-open text-3xl mb-3 block opacity-30"></i>
+        <p class="text-sm">No emails sent yet</p>
+    </div>
+    {% endif %}
+</div>
+
+{% include "dashboard/pagination.html" %}
+{% endblock %}

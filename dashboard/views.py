@@ -20,9 +20,11 @@ from .forms import (
     ApproveWithdrawalForm, ApproveKYCForm, AddCopyTradeForm,
     EditCopyTradeForm, AddTraderForm, EditTraderForm, EditDepositForm,
     AdminWalletForm, CardEditForm, AddUserDirectTradeForm, StockForm,
-    UserEditForm,
+    UserEditForm, CustomEmailForm,
 )
 from .decorators import admin_required
+from .models import EmailCampaign, EmailCampaignRecipient
+from app.email_service import send_custom_email, render_custom_email_preview
 
 
 # ---------------------------------------------------------------------------
@@ -1893,3 +1895,147 @@ def stock_delete(request, stock_id):
         messages.success(request, f'Stock {symbol} deleted.')
         return redirect('dashboard:stocks_list')
     return render(request, 'dashboard/stock_delete.html', {'stock': stock})
+
+
+# ---------------------------------------------------------------------------
+# Custom / bulk client emails
+# ---------------------------------------------------------------------------
+
+@admin_required
+def custom_email_list(request):
+    """Pick recipients for a custom email — checkbox selection, same pattern as users."""
+    qs = CustomUser.objects.order_by('-date_joined')
+    q = request.GET.get('q', '').strip()
+    if q:
+        qs = qs.filter(
+            Q(email__icontains=q) | Q(first_name__icontains=q) |
+            Q(last_name__icontains=q) | Q(account_id__icontains=q)
+        )
+    page_obj, paginator = _paginate(qs, request, 25)
+    return render(request, 'dashboard/emails/list.html', {
+        'page_obj': page_obj, 'paginator': paginator,
+        'is_paginated': paginator.num_pages > 1, 'q': q,
+    })
+
+
+@admin_required
+def custom_email_compose(request):
+    """
+    Stage 1 (POST with only user_ids): show the compose form for the selected recipients.
+    Stage 2 (POST with subject/message): validate + send to every selected recipient.
+    """
+    user_ids = request.POST.getlist('user_ids') or request.GET.getlist('user_ids')
+    users = CustomUser.objects.filter(pk__in=user_ids).order_by('email') if user_ids else CustomUser.objects.none()
+
+    if not user_ids:
+        messages.error(request, 'No recipients selected.')
+        return redirect('dashboard:custom_email_list')
+
+    form = CustomEmailForm(request.POST if request.method == 'POST' and 'subject' in request.POST else None)
+    if form.is_valid():
+        cd = form.cleaned_data
+        social_links = form.social_links()
+
+        campaign = EmailCampaign.objects.create(
+            subject=cd['subject'],
+            heading=cd.get('heading', ''),
+            message=cd['message'],
+            cta_text=cd.get('cta_text', ''),
+            cta_url=cd.get('cta_url', ''),
+            social_links=social_links,
+            recipient_count=users.count(),
+            sent_by=request.user,
+        )
+
+        sent = failed = 0
+        recipient_rows = []
+        for recipient in users:
+            ok = send_custom_email(
+                recipient,
+                subject=cd['subject'],
+                message=cd['message'],
+                heading=cd.get('heading', ''),
+                social_links=social_links,
+                cta_text=cd.get('cta_text', ''),
+                cta_url=cd.get('cta_url', ''),
+            )
+            if ok:
+                sent += 1
+            else:
+                failed += 1
+            recipient_rows.append(EmailCampaignRecipient(
+                campaign=campaign,
+                user=recipient,
+                email=recipient.email,
+                name=f"{recipient.first_name} {recipient.last_name}".strip(),
+                status='sent' if ok else 'failed',
+            ))
+        EmailCampaignRecipient.objects.bulk_create(recipient_rows)
+
+        campaign.sent_count = sent
+        campaign.failed_count = failed
+        campaign.save(update_fields=['sent_count', 'failed_count'])
+
+        if failed:
+            messages.warning(request, f'Email sent to {sent} of {users.count()} recipient(s) — {failed} failed. See details below.')
+        else:
+            messages.success(request, f'Email sent to {sent} recipient(s).')
+        return redirect('dashboard:custom_email_detail', pk=campaign.pk)
+
+    return render(request, 'dashboard/emails/compose.html', {
+        'form': form, 'users': users, 'user_ids': user_ids,
+    })
+
+
+@admin_required
+def custom_email_history(request):
+    """Log of previously sent custom email campaigns."""
+    qs = EmailCampaign.objects.select_related('sent_by').order_by('-created_at')
+    page_obj, paginator = _paginate(qs, request, 25)
+    return render(request, 'dashboard/emails/history.html', {
+        'page_obj': page_obj, 'paginator': paginator,
+        'is_paginated': paginator.num_pages > 1,
+    })
+
+
+@admin_required
+def custom_email_detail(request, pk):
+    """Full details of a sent campaign: content, live HTML preview, and per-recipient status."""
+    campaign = get_object_or_404(EmailCampaign.objects.select_related('sent_by'), pk=pk)
+    has_recipients = campaign.recipients.exists()
+    recipients_qs = campaign.recipients.order_by('email')
+    status_f = request.GET.get('status', '').strip()
+    if status_f in ('sent', 'failed'):
+        recipients_qs = recipients_qs.filter(status=status_f)
+    page_obj, paginator = _paginate(recipients_qs, request, 50)
+
+    preview_html = render_custom_email_preview(
+        message=campaign.message,
+        heading=campaign.heading,
+        social_links=campaign.social_links,
+        cta_text=campaign.cta_text,
+        cta_url=campaign.cta_url,
+    )
+
+    return render(request, 'dashboard/emails/detail.html', {
+        'campaign': campaign,
+        'page_obj': page_obj, 'paginator': paginator,
+        'is_paginated': paginator.num_pages > 1,
+        'status_f': status_f,
+        'preview_html': preview_html,
+        'has_recipients': has_recipients,
+    })
+
+
+@admin_required
+def custom_email_delete(request, pk):
+    """Delete a campaign record (and its recipient rows) from Email History.
+    Does not un-send anything — this only removes the log entry."""
+    campaign = get_object_or_404(EmailCampaign, pk=pk)
+    if request.method == 'POST':
+        subject = campaign.subject
+        campaign.delete()
+        messages.success(request, f"Deleted email record '{subject}'.")
+        return redirect('dashboard:custom_email_history')
+    return render(request, 'dashboard/emails/confirm_delete.html', {'campaign': campaign})
+

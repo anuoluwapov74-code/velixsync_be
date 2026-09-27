@@ -998,3 +998,69 @@ class StockForm(forms.Form):
         required=False,
         widget=forms.ClearableFileInput(attrs={'class': _input, 'accept': 'image/*'}),
     )
+
+
+# ===== Custom / bulk client email =====
+
+class CustomEmailForm(forms.Form):
+    """Compose form for admin-sent custom/bulk client emails (dashboard.EmailCampaign)."""
+
+    subject  = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={"placeholder": "Email subject line"}),
+    )
+    heading  = forms.CharField(
+        max_length=255, required=False,
+        widget=forms.TextInput(attrs={"placeholder": "e.g. Important account update (optional)"}),
+        help_text="Large headline shown under the greeting. Leave blank to omit.",
+    )
+    message  = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 10, "placeholder": "Write the email body here…"}),
+        help_text="Plain text — blank lines start a new paragraph.",
+    )
+    cta_text = forms.CharField(
+        max_length=100, required=False,
+        widget=forms.TextInput(attrs={"placeholder": "e.g. View Dashboard (optional)"}),
+        label="Button text",
+    )
+    cta_url  = forms.URLField(
+        required=False,
+        widget=forms.URLInput(attrs={"placeholder": "https://… (optional)"}),
+        label="Button link",
+    )
+
+    # Social links — each optional. An icon only appears in the email footer
+    # if its URL is filled in here.
+    facebook_url  = forms.URLField(required=False, label="Facebook",
+                                    widget=forms.URLInput(attrs={"placeholder": "https://facebook.com/…"}))
+    twitter_url   = forms.URLField(required=False, label="Twitter / X",
+                                    widget=forms.URLInput(attrs={"placeholder": "https://x.com/…"}))
+    instagram_url = forms.URLField(required=False, label="Instagram",
+                                    widget=forms.URLInput(attrs={"placeholder": "https://instagram.com/…"}))
+    linkedin_url  = forms.URLField(required=False, label="LinkedIn",
+                                    widget=forms.URLInput(attrs={"placeholder": "https://linkedin.com/…"}))
+    telegram_url  = forms.URLField(required=False, label="Telegram",
+                                    widget=forms.URLInput(attrs={"placeholder": "https://t.me/…"}))
+    youtube_url   = forms.URLField(required=False, label="YouTube",
+                                    widget=forms.URLInput(attrs={"placeholder": "https://youtube.com/…"}))
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("cta_text") and not cleaned.get("cta_url"):
+            self.add_error("cta_url", "Add a link, or clear the button text.")
+        if cleaned.get("cta_url") and not cleaned.get("cta_text"):
+            self.add_error("cta_text", "Add button text, or clear the link.")
+        return cleaned
+
+    def social_links(self) -> dict:
+        """Non-empty {platform: url} pairs, ready for email_service.send_custom_email."""
+        cd = self.cleaned_data
+        links = {
+            "facebook":  cd.get("facebook_url", ""),
+            "twitter":   cd.get("twitter_url", ""),
+            "instagram": cd.get("instagram_url", ""),
+            "linkedin":  cd.get("linkedin_url", ""),
+            "telegram":  cd.get("telegram_url", ""),
+            "youtube":   cd.get("youtube_url", ""),
+        }
+        return {k: v for k, v in links.items() if v}

@@ -279,6 +279,32 @@ def copy_trader_action(request):
     if action == "copy":
         from decimal import Decimal
 
+        # One trader at a time: any other active relationship blocks copying a
+        # different trader. A pending cancel request still counts as active
+        # until admin approves it — the user must wait for that resolution.
+        existing_active = (
+            UserTraderCopy.objects.filter(user=user, is_actively_copying=True)
+            .exclude(trader=trader)
+            .select_related("trader")
+            .first()
+        )
+        if existing_active:
+            if existing_active.cancel_requested:
+                return Response({
+                    "success": False,
+                    "error": (
+                        f"Your cancellation request for {existing_active.trader.name} is still "
+                        "pending admin approval. Please wait for it to be approved before copying a new trader."
+                    ),
+                }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                "success": False,
+                "error": (
+                    f"You are already copying {existing_active.trader.name}. Please cancel that "
+                    "relationship and wait for admin approval before copying a new trader."
+                ),
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         if user.balance < trader.min_account_threshold:
             return Response({
                 "success": False,

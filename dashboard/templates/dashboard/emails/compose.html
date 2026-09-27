@@ -1,0 +1,128 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Compose Email - VelixSync Admin{% endblock %}
+{% block page_title %}Compose Email{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+    <a href="{% url 'dashboard:custom_email_list' %}" class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-4">
+        <i class="fas fa-arrow-left text-xs"></i>Back to recipients
+    </a>
+
+    <!-- Selected recipients summary -->
+    <div class="bg-white rounded-xl border border-gray-200/60 p-5 mb-6">
+        <div class="flex items-center gap-2 mb-3">
+            <p class="text-xs font-semibold uppercase tracking-widest text-gray-400">Recipients</p>
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600">{{ users|length }}</span>
+        </div>
+        {% if users %}
+        <div class="flex flex-wrap gap-2">
+            {% for u in users %}
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-200">
+                <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-indigo-100 text-indigo-600">{{ u.email|first|upper }}</span>
+                <span class="text-xs font-medium text-gray-700">{{ u.email }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-red-500">No recipients selected. <a href="{% url 'dashboard:custom_email_list' %}" class="text-indigo-600 underline">Go back</a> and select users first.</p>
+        {% endif %}
+    </div>
+
+    {% if users %}
+    <div class="bg-white rounded-xl border border-gray-200/60 p-6">
+        {% if form.non_field_errors %}
+        <div class="mb-4 px-4 py-3 text-sm bg-red-50 border border-red-200 text-red-600 rounded-lg">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {% for uid in user_ids %}
+            <input type="hidden" name="user_ids" value="{{ uid }}">
+            {% endfor %}
+
+            <h2 class="text-base font-semibold text-gray-800 mb-4">Email Content</h2>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Subject *</label>
+                <input type="text" name="subject" value="{{ form.subject.value|default:'' }}" required placeholder="Email subject line"
+                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                {% if form.subject.errors %}<p class="text-xs mt-1 text-red-500">{{ form.subject.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Heading</label>
+                <input type="text" name="heading" value="{{ form.heading.value|default:'' }}" placeholder="Large headline under the greeting (optional)"
+                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                {% if form.heading.errors %}<p class="text-xs mt-1 text-red-500">{{ form.heading.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-600 mb-1">Message Body *</label>
+                <textarea name="message" rows="10" required placeholder="Write the email body here… blank lines start a new paragraph."
+                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">{{ form.message.value|default:'' }}</textarea>
+                {% if form.message.errors %}<p class="text-xs mt-1 text-red-500">{{ form.message.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 p-4 rounded-lg bg-gray-50 border border-gray-200">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Button Text</label>
+                    <input type="text" name="cta_text" value="{{ form.cta_text.value|default:'' }}" placeholder="e.g. View Dashboard"
+                        class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    {% if form.cta_text.errors %}<p class="text-xs mt-1 text-red-500">{{ form.cta_text.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Button Link</label>
+                    <input type="url" name="cta_url" value="{{ form.cta_url.value|default:'' }}" placeholder="https://…"
+                        class="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    {% if form.cta_url.errors %}<p class="text-xs mt-1 text-red-500">{{ form.cta_url.errors.0 }}</p>{% endif %}
+                </div>
+                <p class="text-xs sm:col-span-2 text-gray-400">Optional call-to-action button. Fill in both fields, or leave both blank.</p>
+            </div>
+
+            <h2 class="text-base font-semibold text-gray-800 mb-1">Social Media Links</h2>
+            <p class="text-xs mb-4 text-gray-400">Only platforms you fill in will show an icon in the email footer — leave blank to hide.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Facebook</label>
+                    <input type="url" name="facebook_url" value="{{ form.facebook_url.value|default:'' }}" placeholder="https://facebook.com/…" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    {% if form.facebook_url.errors %}<p class="text-xs mt-1 text-red-500">{{ form.facebook_url.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Twitter / X</label>
+                    <input type="url" name="twitter_url" value="{{ form.twitter_url.value|default:'' }}" placeholder="https://x.com/…" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    {% if form.twitter_url.errors %}<p class="text-xs mt-1 text-red-500">{{ form.twitter_url.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Instagram</label>
+                    <input type="url" name="instagram_url" value="{{ form.instagram_url.value|default:'' }}" placeholder="https://instagram.com/…" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    {% if form.instagram_url.errors %}<p class="text-xs mt-1 text-red-500">{{ form.instagram_url.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">LinkedIn</label>
+                    <input type="url" name="linkedin_url" value="{{ form.linkedin_url.value|default:'' }}" placeholder="https://linkedin.com/…" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    {% if form.linkedin_url.errors %}<p class="text-xs mt-1 text-red-500">{{ form.linkedin_url.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">Telegram</label>
+                    <input type="url" name="telegram_url" value="{{ form.telegram_url.value|default:'' }}" placeholder="https://t.me/…" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    {% if form.telegram_url.errors %}<p class="text-xs mt-1 text-red-500">{{ form.telegram_url.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">YouTube</label>
+                    <input type="url" name="youtube_url" value="{{ form.youtube_url.value|default:'' }}" placeholder="https://youtube.com/…" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    {% if form.youtube_url.errors %}<p class="text-xs mt-1 text-red-500">{{ form.youtube_url.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-500 transition">
+                    <i class="fas fa-paper-plane mr-1"></i>Send to {{ users|length }} Recipient{{ users|length|pluralize }}
+                </button>
+                <a href="{% url 'dashboard:custom_email_list' %}" class="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition text-center">Cancel</a>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

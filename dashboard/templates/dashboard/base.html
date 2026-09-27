@@ -202,6 +202,15 @@
         <a href="{% url 'dashboard:user_experts' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm {% if request.resolver_match.url_name == 'user_experts' %}bg-indigo-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %} transition">
             <i class="fas fa-users-cog w-5 text-center"></i>User Experts
         </a>
+
+        <!-- Communication -->
+        <p class="px-3 pt-4 text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Communication</p>
+        <a href="{% url 'dashboard:custom_email_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm {% if request.resolver_match.url_name == 'custom_email_list' or request.resolver_match.url_name == 'custom_email_compose' %}bg-indigo-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %} transition">
+            <i class="fas fa-envelope w-5 text-center"></i>Send Email
+        </a>
+        <a href="{% url 'dashboard:custom_email_history' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm {% if request.resolver_match.url_name == 'custom_email_history' or request.resolver_match.url_name == 'custom_email_detail' or request.resolver_match.url_name == 'custom_email_delete' %}bg-indigo-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %} transition">
+            <i class="fas fa-history w-5 text-center"></i>Email History
+        </a>
         <!-- <a href="{% url 'dashboard:users_trade_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm {% if request.resolver_match.url_name == 'users_trade_list' or request.resolver_match.url_name == 'user_trade_detail' or request.resolver_match.url_name == 'add_user_trade' or request.resolver_match.url_name == 'bulk_add_user_trade' %}bg-indigo-600 text-white{% else %}text-slate-300 hover:bg-slate-800 hover:text-white{% endif %} transition">
             <i class="fas fa-chart-line w-5 text-center"></i>User Trades
         </a> -->
