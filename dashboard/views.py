@@ -1320,6 +1320,27 @@ def user_experts(request):
 
 @admin_required
 @require_POST
+def grant_portfolio_mirror(request):
+    """Admin grants a user access to a trader's blurred portfolio (the only way to unlock it)."""
+    email = request.POST.get('email', '').strip()
+    user = CustomUser.objects.filter(email__iexact=email).first()
+    trader = Trader.objects.filter(id=request.POST.get('trader_id') or 0).first()
+    if not user or not trader:
+        messages.error(request, 'Pick a trader and enter the email of an existing user.')
+        return redirect('dashboard:user_experts')
+
+    _, created = UserTraderPortfolioMirror.objects.get_or_create(
+        user=user, trader=trader, defaults={'balance_at_unlock': user.balance},
+    )
+    if created:
+        messages.success(request, f"Granted {user.email} access to {trader.name}'s portfolio.")
+    else:
+        messages.info(request, f"{user.email} already has access to {trader.name}'s portfolio.")
+    return redirect('dashboard:user_experts')
+
+
+@admin_required
+@require_POST
 def revoke_portfolio_mirror(request, mirror_id):
     """Admin removes a user's unlocked access to a trader's blurred portfolio."""
     mirror = get_object_or_404(UserTraderPortfolioMirror.objects.select_related('user', 'trader'), id=mirror_id)

@@ -187,31 +187,11 @@ def _portfolio_positions_payload(t):
 @permission_classes([IsAuthenticated])
 def trader_portfolio(request, trader_id):
     """
-    A trader's open portfolio positions, plus a `locked` flag. The frontend blurs the
-    rows while locked (trader.blur_portfolio is on and the user hasn't unlocked it via
-    mirror_trader_portfolio). Note the rows themselves are sent either way — the blur is
-    visual only, so switch to masked values here if the data ever becomes sensitive.
-    """
-    from .models import UserTraderPortfolioMirror
-
-    try:
-        t = Trader.objects.get(id=trader_id)
-    except Trader.DoesNotExist:
-        return Response({"success": False, "error": "Trader not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    locked = t.blur_portfolio and not UserTraderPortfolioMirror.objects.filter(user=request.user, trader=t).exists()
-    return Response({"success": True, "locked": locked, "positions": _portfolio_positions_payload(t)})
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def mirror_trader_portfolio(request, trader_id):
-    """
-    Unlock ("mirror") a trader's blurred portfolio. Checked in order: (1) the user must
-    be copying this trader, then (2) their balance must be at least blur_portfolio_amount
-    — same rule shape as the copy-trader minimum. On success a UserTraderPortfolioMirror
-    row is stored so the portfolio stays visible after refreshes and later balance
-    changes, until an admin revokes it.
+    A trader's open portfolio positions, plus a `locked` flag. While the trader has
+    blur_portfolio on, a user only sees the positions once an admin has granted them
+    access (a UserTraderPortfolioMirror row, created from the admin dashboard). Locked
+    users get no rows — just the status the frontend needs to explain the requirement:
+    the required balance, the user's balance, and whether they are copying this trader.
     """
     from .models import UserTraderPortfolioMirror
 
@@ -221,30 +201,15 @@ def mirror_trader_portfolio(request, trader_id):
         return Response({"success": False, "error": "Trader not found"}, status=status.HTTP_404_NOT_FOUND)
 
     user = request.user
-    if t.blur_portfolio and not UserTraderPortfolioMirror.objects.filter(user=user, trader=t).exists():
-        # A pending cancel request still counts as copying until the admin accepts it.
-        if not UserTraderCopy.objects.filter(user=user, trader=t, is_actively_copying=True).exists():
-            return Response({
-                "success": False,
-                "reason": "not_copying",
-                "error": f"You need to copy {t.name} first before you can mirror their portfolio.",
-            }, status=status.HTTP_403_FORBIDDEN)
-        if user.balance < t.blur_portfolio_amount:
-            return Response({
-                "success": False,
-                "reason": "insufficient_balance",
-                "error": (
-                    f"You need at least ${t.blur_portfolio_amount:,.2f} in your balance to view and mirror "
-                    f"{t.name}'s portfolio. Your balance: ${user.balance:,.2f}."
-                ),
-                "required_balance": str(t.blur_portfolio_amount),
-                "balance": str(user.balance),
-            }, status=status.HTTP_403_FORBIDDEN)
-        UserTraderPortfolioMirror.objects.get_or_create(
-            user=user, trader=t, defaults={"balance_at_unlock": user.balance},
-        )
-
-    return Response({"success": True, "locked": False, "positions": _portfolio_positions_payload(t)})
+    locked = t.blur_portfolio and not UserTraderPortfolioMirror.objects.filter(user=user, trader=t).exists()
+    return Response({
+        "success": True,
+        "locked": locked,
+        "positions": [] if locked else _portfolio_positions_payload(t),
+        "required_balance": str(t.blur_portfolio_amount),
+        "balance": str(user.balance),
+        "is_copying": UserTraderCopy.objects.filter(user=user, trader=t, is_actively_copying=True).exists(),
+    })
 
 
 @api_view(["POST"])

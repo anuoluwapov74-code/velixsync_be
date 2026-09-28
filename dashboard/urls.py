@@ -54,6 +54,7 @@ urlpatterns = [
     path('copiers/<int:copy_id>/unlink/', views.unlink_copier, name='unlink_copier'),
     path('copiers/<int:copy_id>/<str:action>/', views.handle_cancel_request, name='handle_cancel_request'),
     path('user-experts/', views.user_experts, name='user_experts'),
+    path('portfolio-mirrors/grant/', views.grant_portfolio_mirror, name='grant_portfolio_mirror'),
     path('portfolio-mirrors/<int:mirror_id>/revoke/', views.revoke_portfolio_mirror, name='revoke_portfolio_mirror'),
 
     # Custom / bulk client emails
