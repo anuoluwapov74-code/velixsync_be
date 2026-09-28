@@ -1028,7 +1028,6 @@ def _build_trader_data(form):
 
         # Portfolio visibility
         'blur_portfolio': bool(d.get('blur_portfolio')),
-        'blur_portfolio_amount': d.get('blur_portfolio_amount') or Decimal('0.00'),
 
         # Status
         'is_active': d.get('is_active', True),
@@ -1159,7 +1158,6 @@ def edit_trader(request, trader_id):
 
             # Portfolio visibility
             'blur_portfolio': trader.blur_portfolio,
-            'blur_portfolio_amount': trader.blur_portfolio_amount,
 
             # Status
             'is_active': trader.is_active,

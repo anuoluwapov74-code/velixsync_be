@@ -138,7 +138,6 @@ def trader_detail(request, trader_id):
         "portfolio_breakdown": t.portfolio_breakdown,
         "top_traded": t.top_traded,
         "blur_portfolio": t.blur_portfolio,
-        "blur_portfolio_amount": str(t.blur_portfolio_amount),
         "is_active": t.is_active,
         "created_at": t.created_at.isoformat() if t.created_at else None,
         "updated_at": t.updated_at.isoformat() if t.updated_at else None,
@@ -191,7 +190,8 @@ def trader_portfolio(request, trader_id):
     blur_portfolio on, a user only sees the positions once an admin has granted them
     access (a UserTraderPortfolioMirror row, created from the admin dashboard). Locked
     users get no rows — just the status the frontend needs to explain the requirement:
-    the required balance, the user's balance, and whether they are copying this trader.
+    the required balance (the trader's copy_value), the user's balance, and whether
+    they are copying this trader.
     """
     from .models import UserTraderPortfolioMirror
 
@@ -206,7 +206,7 @@ def trader_portfolio(request, trader_id):
         "success": True,
         "locked": locked,
         "positions": [] if locked else _portfolio_positions_payload(t),
-        "required_balance": str(t.blur_portfolio_amount),
+        "required_balance": str(t.copy_value),
         "balance": str(user.balance),
         "is_copying": UserTraderCopy.objects.filter(user=user, trader=t, is_actively_copying=True).exists(),
     })

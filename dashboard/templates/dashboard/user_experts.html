@@ -257,7 +257,7 @@
                 <td class="px-5 py-3">
                     <a href="{% url 'dashboard:trader_detail' m.trader.id %}" class="font-medium text-indigo-600 hover:text-indigo-800 hover:underline">{{ m.trader.name }}</a>
                 </td>
-                <td class="px-5 py-3 font-semibold text-gray-800">${{ m.trader.blur_portfolio_amount|floatformat:2|intcomma }}</td>
+                <td class="px-5 py-3 font-semibold text-gray-800">${{ m.trader.copy_value|floatformat:2|intcomma }}</td>
                 <td class="px-5 py-3 text-gray-600">${{ m.balance_at_unlock|floatformat:2|intcomma }}</td>
                 <td class="px-5 py-3 text-xs text-gray-400">{{ m.created_at|date:"M d, Y" }}</td>
                 <td class="px-5 py-3">

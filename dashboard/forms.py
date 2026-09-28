@@ -434,12 +434,7 @@ class AddTraderForm(forms.Form):
     blur_portfolio = forms.BooleanField(
         label="Blur Portfolio tab", required=False, initial=True,
         widget=forms.CheckboxInput(attrs={'class': _checkbox}),
-        help_text="On: the Portfolio tab is blurred and locked for every user until you grant them access (User Experts page). Off: it is always visible."
-    )
-    blur_portfolio_amount = forms.DecimalField(
-        label="Blur Portfolio Amount ($)", max_digits=20, decimal_places=2, required=False, initial=0.00, min_value=0,
-        widget=forms.NumberInput(attrs={'class': _input, 'placeholder': '1000.00', 'step': '0.01', 'min': '0'}),
-        help_text="Capital threshold shown to users as the requirement for viewing this trader's portfolio"
+        help_text="On: the Portfolio tab is blurred and locked for every user until you grant them access (User Experts page). The requirement shown to users is this trader's Copy Value. Off: it is always visible."
     )
 
     # --- Status ---
