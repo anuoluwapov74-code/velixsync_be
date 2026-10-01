@@ -900,6 +900,12 @@ def bulk_update_trader_stats(request):
     profit_share_pct = get_pct('profit_share_pct')
     followers_pct   = get_pct('followers_pct')
     min_capital_pct = get_pct('min_capital_pct')
+    blur_portfolio_amount_pct = get_pct('blur_portfolio_amount_pct')
+    copy_value_pct  = get_pct('copy_value_pct')
+    subscribers_pct = get_pct('subscribers_pct')
+    cumulative_copiers_pct = get_pct('cumulative_copiers_pct')
+    cumulative_earnings_copiers_pct = get_pct('cumulative_earnings_copiers_pct')
+    expert_rating_pct = get_pct('expert_rating_pct')
 
     traders = list(Trader.objects.filter(id__in=trader_ids))
     fields_to_update = []
@@ -928,6 +934,18 @@ def bulk_update_trader_stats(request):
             trader.followers = round((trader.followers or 0) * float(1 + followers_pct / 100))
         if min_capital_pct:
             trader.min_account_threshold = (trader.min_account_threshold or Decimal('0')) * (1 + min_capital_pct / 100)
+        if blur_portfolio_amount_pct:
+            trader.blur_portfolio_amount = (trader.blur_portfolio_amount or Decimal('0')) * (1 + blur_portfolio_amount_pct / 100)
+        if copy_value_pct:
+            trader.copy_value = (trader.copy_value or Decimal('0')) * (1 + copy_value_pct / 100)
+        if subscribers_pct:
+            trader.subscribers = round((trader.subscribers or 0) * float(1 + subscribers_pct / 100))
+        if cumulative_copiers_pct:
+            trader.cumulative_copiers = round((trader.cumulative_copiers or 0) * float(1 + cumulative_copiers_pct / 100))
+        if cumulative_earnings_copiers_pct:
+            trader.cumulative_earnings_copiers = (trader.cumulative_earnings_copiers or Decimal('0')) * (1 + cumulative_earnings_copiers_pct / 100)
+        if expert_rating_pct:
+            trader.expert_rating = min((trader.expert_rating or Decimal('0')) * (1 + expert_rating_pct / 100), Decimal('5.00'))
 
     # Build the list of fields that were touched
     if gain_pct:        fields_to_update.append('gain')
@@ -939,6 +957,12 @@ def bulk_update_trader_stats(request):
     if profit_share_pct: fields_to_update.append('profit_share')
     if followers_pct:   fields_to_update.append('followers')
     if min_capital_pct: fields_to_update.append('min_account_threshold')
+    if blur_portfolio_amount_pct: fields_to_update.append('blur_portfolio_amount')
+    if copy_value_pct:  fields_to_update.append('copy_value')
+    if subscribers_pct: fields_to_update.append('subscribers')
+    if cumulative_copiers_pct: fields_to_update.append('cumulative_copiers')
+    if cumulative_earnings_copiers_pct: fields_to_update.append('cumulative_earnings_copiers')
+    if expert_rating_pct: fields_to_update.append('expert_rating')
 
     if traders and fields_to_update:
         try:
@@ -1028,6 +1052,7 @@ def _build_trader_data(form):
 
         # Portfolio visibility
         'blur_portfolio': bool(d.get('blur_portfolio')),
+        'blur_portfolio_amount': d.get('blur_portfolio_amount') or Decimal('50000.00'),
 
         # Status
         'is_active': d.get('is_active', True),
@@ -1158,6 +1183,7 @@ def edit_trader(request, trader_id):
 
             # Portfolio visibility
             'blur_portfolio': trader.blur_portfolio,
+            'blur_portfolio_amount': trader.blur_portfolio_amount,
 
             # Status
             'is_active': trader.is_active,

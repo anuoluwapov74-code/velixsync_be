@@ -824,6 +824,7 @@ class TraderAdmin(admin.ModelAdmin):
         ('Portfolio Visibility', {
             'fields': (
                 'blur_portfolio',
+                'blur_portfolio_amount',
             )
         }),
         ('Performance Statistics', {

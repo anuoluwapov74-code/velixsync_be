@@ -711,9 +711,15 @@ class Trader(models.Model):
     # Portfolio visibility
     blur_portfolio = models.BooleanField(
         default=True,
-        help_text="If on, this trader's Portfolio tab is blurred for every user until an admin grants "
-                  "them access (User Experts page). The requirement shown to users is this trader's "
-                  "'Copy value'. If off, the portfolio is always visible."
+        help_text="If on, this trader's Portfolio tab is blurred for users until they unlock it "
+                  "by having at least the 'Blur portfolio amount' in their balance. If off, the portfolio is always visible."
+    )
+    blur_portfolio_amount = models.DecimalField(
+        max_digits=20,
+        decimal_places=2,
+        default=1000000.00,
+        help_text="Minimum user balance ($) required to view and mirror this trader's portfolio "
+                  "(only applies when 'Blur portfolio' is on)"
     )
 
     # Metadata

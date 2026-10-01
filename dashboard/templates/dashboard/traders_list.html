@@ -221,6 +221,55 @@
                         <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
                     </div>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Blur Portfolio Amount %</label>
+                    <div class="relative">
+                        <input type="number" name="blur_portfolio_amount_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Copy Value %</label>
+                    <div class="relative">
+                        <input type="number" name="copy_value_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Subscribers %</label>
+                    <div class="relative">
+                        <input type="number" name="subscribers_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cumulative Copiers %</label>
+                    <div class="relative">
+                        <input type="number" name="cumulative_copiers_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cumulative Earnings of Copiers %</label>
+                    <div class="relative">
+                        <input type="number" name="cumulative_earnings_copiers_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Expert Rating %</label>
+                    <div class="relative">
+                        <input type="number" name="expert_rating_pct" value="0" step="0.01" min="0"
+                            class="w-full pr-10 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-1">Capped at 5.00.</p>
+                </div>
             </div>
         </div>
 
@@ -407,7 +456,9 @@ function submitBulkForm() {
 
     // Copy percentage fields from modal (they live outside <form>)
     ['gain_pct', 'return_ytd_pct', 'return_2y_pct', 'win_rate_pct', 'trades_pct',
-     'copiers_pct', 'profit_share_pct', 'followers_pct', 'min_capital_pct'].forEach(name => {
+     'copiers_pct', 'profit_share_pct', 'followers_pct', 'min_capital_pct',
+     'blur_portfolio_amount_pct', 'copy_value_pct', 'subscribers_pct',
+     'cumulative_copiers_pct', 'cumulative_earnings_copiers_pct', 'expert_rating_pct'].forEach(name => {
         form.querySelectorAll(`input[name="${name}"]`).forEach(el => el.remove());
         const modalInput = document.querySelector(`#stats-modal input[name="${name}"]`);
         if (modalInput) {
