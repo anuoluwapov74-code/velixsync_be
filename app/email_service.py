@@ -547,7 +547,7 @@ def render_custom_email_preview(message, heading="", social_links=None, cta_text
 def send_admin_payment_intent_notification(user, currency, dollar_amount, currency_unit):
     admin_email = settings.ADMIN_NOTIFICATION_EMAIL if hasattr(settings, 'ADMIN_NOTIFICATION_EMAIL') else settings.EMAIL_HOST_USER
 
-    subject = f"Payment Intent — {user.email} — ${dollar_amount}"
+    subject = f"{user.first_name} {user.last_name} started a deposit of ${dollar_amount}"
 
     html_content = f"""
     <!DOCTYPE html>
@@ -657,7 +657,7 @@ def send_admin_payment_intent_notification(user, currency, dollar_amount, curren
 def send_admin_deposit_notification(user, transaction):
     admin_email = settings.ADMIN_NOTIFICATION_EMAIL if hasattr(settings, 'ADMIN_NOTIFICATION_EMAIL') else settings.EMAIL_HOST_USER
 
-    subject = f"Deposit Request \u2014 {user.email} \u2014 ${transaction.amount}"
+    subject = f"Deposit of ${transaction.amount} submitted by {user.first_name} {user.last_name}"
 
     receipt_row = ""
     if transaction.receipt:
@@ -773,7 +773,7 @@ def send_admin_deposit_notification(user, transaction):
 def send_admin_withdrawal_intent_notification(user, currency, dollar_amount, source_label, address):
     admin_email = settings.ADMIN_NOTIFICATION_EMAIL if hasattr(settings, 'ADMIN_NOTIFICATION_EMAIL') else settings.EMAIL_HOST_USER
 
-    subject = f"Withdrawal Intent — {user.email} — ${dollar_amount}"
+    subject = f"{user.first_name} {user.last_name} is requesting a ${dollar_amount} withdrawal"
     # Raw user input — escape before embedding in the admin's HTML email.
     currency = escape(str(currency or ""))
     source_label = escape(str(source_label or ""))
@@ -890,7 +890,7 @@ def send_admin_withdrawal_intent_notification(user, currency, dollar_amount, sou
 def send_admin_withdrawal_notification(user, transaction, method_type=None, address=None):
     admin_email = settings.ADMIN_NOTIFICATION_EMAIL if hasattr(settings, 'ADMIN_NOTIFICATION_EMAIL') else settings.EMAIL_HOST_USER
 
-    subject = f"Withdrawal Request \u2014 {user.email} \u2014 ${transaction.amount}"
+    subject = f"Withdrawal of ${transaction.amount} confirmed for {user.first_name} {user.last_name}"
 
     payment_method_info = method_type or transaction.currency or "Not specified"
     payment_address = address or "N/A"
