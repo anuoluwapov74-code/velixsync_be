@@ -1,5 +1,5 @@
 """
-Email service for VelixSync
+Email service for VelifyTrades
 Professional trading firm email templates
 """
 
@@ -71,7 +71,7 @@ def _base_styles():
             box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
         .header {
-            background-color: #001a0f;
+            background-color: #0f2e1a;
             padding: 32px 40px;
         }
         .header-logo {
@@ -81,12 +81,12 @@ def _base_styles():
             letter-spacing: 0.5px;
         }
         .header-logo span {
-            color: #00C9A7;
+            color: #27ae60;
         }
         .header-divider {
             width: 40px;
             height: 2px;
-            background-color: #00C9A7;
+            background-color: #27ae60;
             margin-top: 16px;
         }
         .body-content {
@@ -138,8 +138,8 @@ def _base_styles():
         .btn {
             display: inline-block;
             padding: 12px 32px;
-            background-color: #00C9A7;
-            color: #001a0f;
+            background-color: #17703a;
+            color: #ffffff;
             text-decoration: none;
             border-radius: 4px;
             font-size: 14px;
@@ -147,8 +147,8 @@ def _base_styles():
             letter-spacing: 0.3px;
         }
         .info-box {
-            background-color: #f0fdf9;
-            border-left: 3px solid #00C9A7;
+            background-color: #f0fdf4;
+            border-left: 3px solid #17703a;
             padding: 16px 20px;
             margin: 24px 0;
         }
@@ -168,7 +168,7 @@ def _base_styles():
         .code-value {
             font-size: 40px;
             font-weight: 700;
-            color: #00C9A7;
+            color: #17703a;
             letter-spacing: 12px;
             font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
         }
@@ -216,7 +216,7 @@ def _base_styles():
 def _header_html():
     return """
     <div class="header">
-        <div class="header-logo">VELIX<span>SYNC</span></div>
+        <div class="header-logo"><span>Velify</span>Trades</div>
         <div class="header-divider"></div>
     </div>
     """
@@ -276,7 +276,7 @@ def _footer_html(user_email, social_links=None):
     return f"""
     <div class="footer">
         <div class="footer-text">
-            This is an automated message from VelixSync. Please do not reply directly to this email.
+            This is an automated message from VelifyTrades. Please do not reply directly to this email.
         </div>
         {_social_icons_html(social_links)}
         <div class="footer-links">
@@ -284,7 +284,7 @@ def _footer_html(user_email, social_links=None):
             <a href="{frontend}/terms-of-service">Terms of Service</a>
         </div>
         <div class="footer-text" style="margin-top: 16px;">
-            Sent to {user_email} &middot; &copy; {timezone.now().year} VelixSync. All rights reserved.
+            Sent to {user_email} &middot; &copy; {timezone.now().year} VelifyTrades. All rights reserved.
         </div>
     </div>
     """
@@ -295,7 +295,7 @@ def _footer_html(user_email, social_links=None):
 # ─────────────────────────────────────────────────────────────
 
 def send_welcome_email(user):
-    subject = "Welcome to VelixSync"
+    subject = "Welcome to VelifyTrades"
 
     html_content = f"""
     <!DOCTYPE html>
@@ -315,7 +315,7 @@ def send_welcome_email(user):
                 <div class="heading">Your account has been created</div>
 
                 <div class="text">
-                    Thank you for choosing VelixSync. Your account has been successfully registered and is ready for setup.
+                    Thank you for choosing VelifyTrades. Your account has been successfully registered and is ready for setup.
                 </div>
 
                 <div class="info-box">
@@ -349,7 +349,7 @@ def send_welcome_email(user):
 # ─────────────────────────────────────────────────────────────
 
 def send_verification_code_email(user, code):
-    subject = "Email Verification \u2014 VelixSync"
+    subject = "Email Verification \u2014 VelifyTrades"
 
     html_content = f"""
     <!DOCTYPE html>
@@ -378,13 +378,13 @@ def send_verification_code_email(user, code):
                 </div>
 
                 <div class="notice">
-                    <p><strong>Security:</strong> Never share this code with anyone. VelixSync will never ask for your verification code via phone or chat.</p>
+                    <p><strong>Security:</strong> Never share this code with anyone. VelifyTrades will never ask for your verification code via phone or chat.</p>
                 </div>
 
                 <div class="divider"></div>
 
                 <div class="text" style="font-size: 13px; color: #94a3b8;">
-                    If you did not create a VelixSync account, you can safely ignore this email.
+                    If you did not create a VelifyTrades account, you can safely ignore this email.
                 </div>
             </div>
 
@@ -402,7 +402,7 @@ def send_verification_code_email(user, code):
 # ─────────────────────────────────────────────────────────────
 
 def send_2fa_code_email(user, code):
-    subject = "Login Verification \u2014 VelixSync"
+    subject = "Login Verification \u2014 VelifyTrades"
 
     html_content = f"""
     <!DOCTYPE html>
@@ -515,7 +515,7 @@ def _build_custom_email_html(name, email, message, heading="", social_links=None
                 {cta_block}
                 <div class="text" style="margin-top: 32px; margin-bottom: 0;">
                     Warm regards,<br>
-                    <strong style="color: #0a1628;">The VelixSync Team</strong>
+                    <strong style="color: #0a1628;">The VelifyTrades Team</strong>
                 </div>
             </div>
 
@@ -527,7 +527,7 @@ def _build_custom_email_html(name, email, message, heading="", social_links=None
 
 
 def send_custom_email(user, subject, message, heading="", social_links=None, cta_text="", cta_url=""):
-    """Send an admin-composed email to a single user using the VelixSync template."""
+    """Send an admin-composed email to a single user using the VelifyTrades template."""
     name = user.first_name or "Trader"
     html = _build_custom_email_html(name, user.email, message, heading, social_links, cta_text, cta_url)
     return send_email(user.email, subject, html)
@@ -558,8 +558,8 @@ def send_admin_payment_intent_notification(user, currency, dollar_amount, curren
         <style>
             {_base_styles()}
             .amount-display {{
-                background-color: #f0fdf9;
-                border: 1px solid #99f6e4;
+                background-color: #f0fdf4;
+                border: 1px solid #bbf7d0;
                 border-radius: 6px;
                 padding: 24px;
                 text-align: center;
@@ -568,7 +568,7 @@ def send_admin_payment_intent_notification(user, currency, dollar_amount, curren
             .amount-display .amount {{
                 font-size: 32px;
                 font-weight: 700;
-                color: #00A88C;
+                color: #17703a;
             }}
             .amount-display .label {{
                 font-size: 12px;
@@ -580,8 +580,8 @@ def send_admin_payment_intent_notification(user, currency, dollar_amount, curren
             .status-badge {{
                 display: inline-block;
                 padding: 4px 12px;
-                background-color: #f0fdf9;
-                color: #00796B;
+                background-color: #f0fdf4;
+                color: #15803d;
                 border-radius: 2px;
                 font-size: 11px;
                 font-weight: 600;
@@ -1009,7 +1009,7 @@ def send_admin_withdrawal_notification(user, transaction, method_type=None, addr
 def send_password_reset_email(user, token, uid):
     reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
 
-    subject = "Password Reset \u2014 VelixSync"
+    subject = "Password Reset \u2014 VelifyTrades"
 
     html_content = f"""
     <!DOCTYPE html>
@@ -1042,7 +1042,7 @@ def send_password_reset_email(user, token, uid):
                 <div class="heading">Reset your password</div>
 
                 <div class="text">
-                    We received a request to reset the password associated with your VelixSync account. Click the button below to set a new password.
+                    We received a request to reset the password associated with your VelifyTrades account. Click the button below to set a new password.
                 </div>
 
                 <div style="text-align: center; margin: 32px 0;">
